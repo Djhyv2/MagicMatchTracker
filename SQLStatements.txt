@@ -1,0 +1,55 @@
+INSERT INTO Players (FirstName,LastName) VALUES ("Dustin","Hengel");
+INSERT INTO Players (FirstName,LastName) VALUES ("Brett","Miller");
+INSERT INTO Decks (Name) VALUES ("Gruul Fecundity Goblins");
+INSERT INTO Decks (Name) VALUES ("Mono-Blue Tron");
+INSERT INTO Decks (Name, Mainboard,Sideboard) VALUES ("5-Color Domain Death's Shadow","1x Arid Mesa
+1x Blood Crypt
+4x Bloodbraid Elf
+4x Bloodstained Mire
+1x Breeding Pool
+1x Dark Confidant
+4x Death's Shadow
+1x Forest
+1x Geist of Saint Traft
+1x Godless Shrine
+1x Hallowed Fountain
+1x Kolaghan's Command
+4x Lightning Bolt
+4x Mantis Rider
+1x Overgrown Tomb
+1x Sacred Foundry
+1x Scalding Tarn
+2x Scavenging Ooze
+1x Steam Vents
+1x Stomping Ground
+4x Street Wraith
+1x Swamp
+4x Tarmogoyf
+1x Temple Garden
+4x Tribal Flames
+1x Watery Grave
+4x Wild Nacatl
+1x Windswept Heath
+4x Wooded Foothills",
+"1x Abrupt Decay
+2x Collective Brutality
+1x Deflecting Palm
+1x Ghost Quarter
+1x Golgari Charm
+1x Jund Charm
+3x Lingering Souls
+3x Path to Exile
+1x Rakdos Charm
+1x Stony Silence");
+INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Player1DeckID,Player2DeckID,Date,Tournament) VALUES (1,2,0,2,5,2,4-18-18,0);
+INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Player1DeckID,Player2DeckID,Date,Tournament) VALUES (1,2,0,2,5,2,'2018-04-18',0);
+INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Player1DeckID,Player2DeckID,Date,Tournament) VALUES (1,2,1,2,5,2,'2018-04-18',0);
+INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Player1DeckID,Player2DeckID,Date,Tournament) VALUES (1,2,1,2,1,1,STR_TO_DATE('04-17-18','%m-%d-%y'),0)
+
+
+SELECT Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+FROM Matches
+JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
+JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
+JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
+JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID; 

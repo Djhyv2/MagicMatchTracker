@@ -18,6 +18,14 @@
             $sql=null;
         }//Destructor for Model
         
+        public function read()
+        {
+            $matches=array();
+            
+        }//Reads Matches from Database
+        
+        
+        
         
     }
 ?>
