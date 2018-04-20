@@ -64,7 +64,7 @@
                 if($sql->connect_error==null)
                 {
                     $preparedStatement = $sql->prepare('
-                        SELECT Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+                        SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
                         FROM Matches
                         JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
                         JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
@@ -116,7 +116,26 @@
             return $sql->connect_error;//Returns Connection Error
         }
         
-        
+        public function addMatch($match)
+        {
+            $error="";//Holds Error String
+            $player1FirstName=$match['player1FirstName'];
+            $player1LastName=$match['player1LastName'];
+            $player1DeckName=$match['player1DeckName'];
+            $player1MainBoard=$match['player1MainBoard'];
+            $player2SideBoard=$match['player1SideBoard'];
+            $player2FirstName=$match['player2FirstName'];
+            $player2LastName=$match['player2LastName'];
+            $player2DeckName=$match['player2DeckName'];
+            $player2MainBoard=$match['player2MainBoard'];
+            $player2SideBoard=$match['player2SideBoard'];
+            $wins=$match['wins'];
+            $losses=$match['losses'];
+            $ties=$match['ties'];
+            $date=$match['date'];
+            $tournament=$match['tournament'];
+            $format=$match['format'];
+        }
         
         
     }
