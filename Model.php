@@ -120,21 +120,61 @@
         {
             $error="";//Holds Error String
             $player1FirstName=$match['player1FirstName'];
-            $player1LastName=$match['player1LastName'];
+            $player1LastName=($match['player1LastName']!=NULL?$match['player1LastName']:"");//Default Blank if Not Specified
             $player1DeckName=$match['player1DeckName'];
-            $player1MainBoard=$match['player1MainBoard'];
-            $player2SideBoard=$match['player1SideBoard'];
-            $player2FirstName=$match['player2FirstName'];
-            $player2LastName=$match['player2LastName'];
+            $player1MainBoard=($match['player1MainBoard']!=NULL?$match['player1MainBoard']:"");//Default Blank if Not Specified
+            $player1SideBoard=($match['player1SideBoard']!=NULL?$match['player1SideBoard']:"");//Default Blank if Not Specified
+            $player2FirstName=($match['player2FirstName']!=NULL?$match['player2LastName']:"");//Default Blank if Not Specified
+            $player2LastName=($match['player1LastName']!=NULL?$match['player2LastName']:"");//Default Blank if Not Specified
             $player2DeckName=$match['player2DeckName'];
-            $player2MainBoard=$match['player2MainBoard'];
-            $player2SideBoard=$match['player2SideBoard'];
+            $player2MainBoard=($match['player2MainBoard']!=NULL?$match['player2MainBoard']:"");//Default Blank if Not Specified
+            $player2SideBoard=($match['player2SideBoard']!=NULL?$match['player2SideBoard']:"");//Default Blank if Not Specified
             $wins=$match['wins'];
             $losses=$match['losses'];
-            $ties=$match['ties'];
+            $ties=($match['ties']!=NULL?$match['ties']:0);//Default 0 Ties is not specified
             $date=$match['date'];
-            $tournament=$match['tournament'];
-            $format=$match['format'];
+            $tournament=($match['tournament']!=NULL?$match['tournament']:0);//Default Not a Tournament if not specified
+            $format=($match['format']!=NULL?match['format']:'Modern');//Default Modern if not specified, Gets Data input from Parameter
+            
+            if($player1FirstName==NULL)
+            {
+                $error="Missing Player 1 First Name";
+                return $error;
+            }
+            
+            if($player1DeckName==NULL)
+            {
+                $error="Missing Player 1 Deck Name";
+                return $error;
+            }
+            
+            if($player2DeckName==NULL)
+            {
+                $error="Missing Player 2 Deck Name";
+                return $error;
+            }
+            
+            if($wins==NULL)
+            {
+                $error="Missing Wins";
+                return $error;
+            }
+            
+            if($losses==NULL)
+            {
+                $error="Missing Losses";
+                return $error;
+            }
+            
+            if($date==NULL)
+            {
+                $error="Missing Date";
+                return $error;
+            }
+            //Returns Error if Missing Critical Info
+            
+            
+            
         }
         
         
