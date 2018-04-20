@@ -26,12 +26,12 @@
             if($sql->connect_error==null)
             {
                 $results = $sql->$query('
-                    SELECT Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+                    SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
                     FROM Matches
                     JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
                     JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
                     JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
-                    JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID;');//Queries SQL Database to Read all Matches
+                    JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID; ');//Queries SQL Database to Read all Matches
                 if($results!=null)
                 {
                     if($result->num_rows > 0)
@@ -64,13 +64,13 @@
                 if($sql->connect_error==null)
                 {
                     $preparedStatement = $sql->prepare('
-                        SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+                        SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
                         FROM Matches
                         JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
                         JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
                         JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
                         JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID
-                        WHERE Matches.ID = ?;');//Prepares statement to inject ID into
+                        WHERE Matches.ID = ?; ');//Prepares statement to inject ID into
                     if($preparedStatement->bind_param("i",$id)==true)
                     {
                         if($preparedStatement->execute()==true)
