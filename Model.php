@@ -21,9 +21,10 @@
         
         public function read()
         {
+            $matches=array();//Array to Store all Matches
+            $error="";//Holds error string
             if($sql->connect_error==null)
             {
-                $matches=array();//Array to Store all Matches
                 $results = $sql->$query('
                     SELECT Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player1Deck.Name AS "Deck", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
                     FROM Matches
@@ -42,9 +43,16 @@
                     }//If result has atleast 1 record
                     $results->close();//Closes results
                 }//If Query had Results
-                
+                else
+                {
+                    $error=$sql->error;
+                }//Else Query Errored
             }//If No Connection Error
-            return $matches;//Returns matches
+            else
+            {
+                $error=$sql->connect_error;
+            }//Else Connection Error
+            return array($matches,$error);//Returns matches and possible error string
         }//Reads Matches from Database
         
         public function getError()
