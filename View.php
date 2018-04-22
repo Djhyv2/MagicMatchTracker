@@ -29,6 +29,7 @@
             }
 
             $body .= "<table>\n"; //open table tag
+            $body .= "<tr><th>delete</th><th>edit</th>"; //html for opening row tag, as well as delete and edit columns
             
             $columns = array(
                 array('name' => 'player1', 'label' => 'Player 1'),
