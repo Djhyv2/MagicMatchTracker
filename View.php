@@ -28,7 +28,9 @@
 
             $body .= "<table>\n"; //open table tag
             $body .= "<tr><th>delete</th><th>edit</th>"; //html for opening row tag, as well as delete and edit columns
-            
+            //delete edit player1.firstname player1.lastname player2.firstname player2.lastname
+            //player1.deck player2.deck wins losses ties dates tournament
+
             $columns = array (
                 array ('name' => 'player1', 'label' => 'Player 1'),
                 array ('name' => 'player2', 'label' => 'Player 2'),
