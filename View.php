@@ -5,7 +5,7 @@
         private $pageTitle = 'Magic Match Tracker'; //varable to store page title; useful for changing page title without hardcoding
 
         public function __construct () {
-            echo "Magic Match Tracker\n<br>Created by: Dustin Hengel, Mercy Housh, Connor Fitzmaurice, and Scott Watkins";//Prints to Standard Out
+            
         }//Constructor for View
         
         public function __destruct () {
@@ -81,8 +81,81 @@
             return $this->page($body);
         }
 
-        public function matchFormView($data = null, $message = ''){
-            
+        public function matchFormView($data = null, $message = '') {
+            $firstName = '';
+            $lastName = '';
+            $deck = '';
+
+            if ($data) { //if data already exists, fill data into fields for editing 
+                $firstName = $data['firstName'];
+                $lastName = $data['lastName'];
+                $deck = $data['deck'];
+            }
+
+            $html = <<<EOT1
+<!DOCTYPE html>
+<html>
+<head>
+<title>{$this->pageTitle}</title>
+<link rel="stylesheet" type="text/css" href="{$this->stylesheet}">
+</head>
+<body>
+<h1>Matches</h1>
+EOT1;
+            //display any messages that are set
+            if ($message) { 
+                $html .= "<p class='message'>$message</p>\n";
+            }
+
+            $html .= "<form action='index.php' method='post'>";
+
+            if ($data['id']) { //if data is already present, then existing data is updated in DB
+                $html .= "<input type='hidden' name='action' value='update' />";
+				$html .= "<input type='hidden' name='id' value='{$data['id']}' />";
+            } else { //otherwise add data to DB
+                $html .= "<input type='hidden' name='action' value='add' />";
+            }
+
+            $html .= <<<EOT2
+  <p>First Name<br />
+  <input type="text" name="firstName" value="$firstName" placeholder="first name" maxlength="255" size="80"></p>
+
+  <p>Last Name<br />
+  <input type="text" name="lastName" value="$lastName" placeholder="last name" maxlength="255" size="80"></p>
+
+  <p>Deck<br />
+  <input type="text" name="deck" value="$deck" placeholder="deck" maxlength="255" size="80"></p>
+  <input type="submit" name='submit' value="Submit"> <input type="submit" name='cancel' value="Cancel">
+</form>
+</body>
+</html>
+EOT2;
+
+            print $html;
         }
+
+        public function errorView($message) { //display any error messages, if set
+			$body = "<h1>Matches</h1>\n";
+			$body .= "<p>$message</p>\n";
+			
+			return $this->page($body);
+		}
+		
+		private function page($body) {
+			$html = <<<EOT
+<!DOCTYPE html>
+<html>
+<head>
+<title>{$this->pageTitle}</title>
+<link rel="stylesheet" type="text/css" href="{$this->stylesheet}">
+</head>
+<body>
+$body
+<p>Created by: Dustin Hengel, Mercy Housh, Connor Fitzmaurice, and Scott Watkins</p>
+</body>
+</html>
+EOT;
+			return $html;
+		}
     }  
 ?>
