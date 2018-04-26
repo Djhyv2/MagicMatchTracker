@@ -207,8 +207,23 @@
             {
                 return $error;
             }//If addDeck errored
+
+            $preparedStatement=$sql->prepare('INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Ties,Player1DeckID,Player2DeckID,Date,Tournament,Format) VALUES (?,?,?,?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?)');//Prepares Insert
+            if($preparedStatement->bind_param("iiiiiiisis",$player1ID,$player2ID,$wins,$losses,$ties,$player1DeckID,$player2DeckID,$date,$tournament,$format)==false)
+            {
+                $error = $sql->error;
+                return $error;//Returns error
+            }//If didn't bind parameter
             
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return $error;
+            }//If Failed to Execute Query
             
+            $preparedStatement->close();//Closes Statement
+            
+            return $error;//Returns empty error if successful
         }
         
         private function addPlayer($firstName,$lastName)
