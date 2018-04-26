@@ -63,11 +63,16 @@ JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID
 WHERE Matches.ID = ?; 
 
 
-SELECT IF(
-    SELECT 1 FROM Players 
-    WHERE FirstName = ? AND LastName = ?
-,
-    NULL
-,
-    INSERT INTO Players (FirstName,LastName) VALUES (?,?)
-);
+
+INSERT IGNORE INTO Players (FirstName,LastName) VALUES (?,?)
+
+SELECT ID FROM Players WHERE FirstName=? AND LastName = ?; 
+
+
+SELECT ID FROM Decks 
+WHERE Name = ? AND Mainboard = ? AND Sideboard = ?;
+
+INSERT INTO Decks (Name,Mainboard,Sideboard) VALUES (?,?,?);
+
+SELECT LAST_INSERT_ID();
+

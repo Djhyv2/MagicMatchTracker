@@ -101,10 +101,13 @@
                 return array($match,$error);//Returns empty match and error string
             }//If Failed to Retrieve Result
             
-            if($result->num_rows==1)
-            {
-                $match=$result->fetch_assoc();//Gets Match with given ID
-            }//If Exactly One Result
+            if($result->num_rows!=1)
+            {   
+                $error="Duplicate Match IDs";
+                return array($match,$error);//Returns empty match and error string
+            }//If Not Exactly One Result
+            
+            $match=$result->fetch_assoc();//Gets Match with given ID
             
             $preparedStatement->close();//Closes Statement
 
@@ -178,15 +181,71 @@
             }
             //Returns Error if Missing Critical Info
             
-            $preparedStatement=$sql->prepare(
-                    
-            )
-            
-            
-            
-            
+            $player1ID=addPlayer($player1FirstName,$player1LastName);
+            if($error!=NULL)
+            {
+                return $error;
+            }//If addPlayer errored
+            $player2ID=addPlayer($player2FirstName,$player2LastName);
+            if($error!=NULL)
+            {
+                return $error;
+            }//If addPlayer errored
             
             
         }
+        
+        private function addPlayer($firstName,$lastName)
+        {
+            $preparedStatement=$sql->prepare('INSERT IGNORE INTO Players (FirstName,LastName) VALUES (?,?)');//Prepares Insert
+            if($preparedStatement->bind_param("ss",$firstName,$lastName)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $preparedStatement->close();//Closes Statement
+            
+            
+            
+            $preparedStatement=$sql->prepare('SELECT ID FROM Players WHERE FirstName = ? AND LastName = ?');//Prepares Select
+            if($preparedStatement->bind_param("ss",$firstName,$lastName)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows!=1)
+            {
+                $error = "Duplicate Players Detected";
+                return -1;//Returns -1 if errored
+            }//If Exactly One Result
+            
+            $id=$result->fetch_assoc()['ID'];//Gets ID with given Name
+            
+            $preparedStatement->close();//Closes Statement
+
+            return $id;//Returns ID    
+        }
+        
     }
 ?>
