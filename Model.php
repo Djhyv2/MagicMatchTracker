@@ -186,11 +186,27 @@
             {
                 return $error;
             }//If addPlayer errored
-            $player2ID=addPlayer($player2FirstName,$player2LastName);
+            $player2ID=NULL;//Default Player2ID to NULL
+            if($player2FirstName!=""||$player2LastName!="")
+            {
+                $player2ID=addPlayer($player2FirstName,$player2LastName);
+                if($error!=NULL)
+                {
+                    return $error;
+                }//If addPlayer errored
+            }//If Player2 Information Exists
+            
+            
+            $player1DeckID=addDeck($player1DeckName,$player1MainBoard,$player1SideBoard);
             if($error!=NULL)
             {
                 return $error;
-            }//If addPlayer errored
+            }//If addDeck errored
+            $player2DeckID=addDeck($player2DeckName,$player2MainBoard,$player2SideBoard);
+            if($error!=NULL)
+            {
+                return $error;
+            }//If addDeck errored
             
             
         }
@@ -245,6 +261,71 @@
             $preparedStatement->close();//Closes Statement
 
             return $id;//Returns ID    
+        }
+        
+        private function addDeck($name,$mainBoard,$sideBoard)
+        {
+            $preparedStatement=$sql->prepare('SELECT ID FROM Decks WHERE Name = ? AND Mainboard = ? AND Sideboard = ?');//Prepares Select
+            if($preparedStatement->bind_param("sss",$name,$mainBoard,$sideBoard)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows==1)
+            {
+                $id=$result->fetch_assoc()['ID'];//Gets ID with given Name
+                return $id;//Returns ID
+            }//If Deck was in Database
+            
+            
+            $preparedStatement=$sql->prepare('INSERT INTO Decks (Name,Mainboard,Sideboard) VALUES (?,?,?);');//Prepares Insert
+            if($preparedStatement->bind_param("sss",$name,$mainBoard,$sideBoard)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $preparedStatement->close();//Closes Statement
+            
+            $results = $sql->query('SELECT LAST_INSERT_ID()');//Queries SQL Database to Read Last Insert ID
+            
+            if($result==null)
+            {
+                $error=$sql->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows!=1)
+            {   
+                $error="LAST_INSERT_ID() ERROR";
+                return -1;//Returns -1 if errored
+            }//If Not Exactly One Result
+            
+            $id=$result->fetch_assoc();//Gets Match with given ID
+            
+            $results->close();//Closes results
+            
+            return $id;//Returns Deck ID
         }
         
     }
