@@ -322,7 +322,8 @@
             
             $preparedStatement->close();//Closes Statement
             
-            $results = $sql->query('SELECT LAST_INSERT_ID()');//Gets Newly Inserted ID
+            
+            $result = $sql->query('SELECT LAST_INSERT_ID()');//Gets Newly Inserted ID
             
             if($result==null)
             {
@@ -338,19 +339,13 @@
             
             $id=$result->fetch_assoc();//Gets Match with given ID
             
-            $results->close();//Closes results
+            $result->close();//Closes result
             
             return $id;//Returns Deck ID
         }
         
-        public function updateMatch($matchID)
+        public function updateMatch($match)
         {
-            if($matchID==null)
-            {
-                $error="No MatchID";
-                return $error;
-            }//If No MatchID
-            
             if($sql->connect_error!=null)
             {
                 $error=$sql->connect_error;
@@ -377,7 +372,14 @@
             $player2ID=($match['player2ID']!=NULL?$match['player2ID']:"");//Default Blank if Not Specified
             $player1DeckID=$match['player1DeckID'];
             $player2DeckID=$match['player2DeckID'];
+            $matchID=$match['matchID'];
 
+            if($matchID==null)
+            {
+                $error="No MatchID";
+                return $error;
+            }//If No MatchID
+            
             if($player1FirstName==NULL)
             {
                 $error="Missing Player 1 First Name";
@@ -433,11 +435,175 @@
             }
             //Returns Error if Missing Critical Info
             
-            
+            $player1ID=updatePlayer($player1ID,$player1FirstName,$player1LastName);//Updates Player1
+            if($error!=NULL)
+            {
+                return $error;
+            }//If updatePlayer Errored
+            if($player2FirstName!=""||$player2LastName!="")
+            {
+                $player2ID=updatePlayer($player2ID,$player2FirstName,$player2LastName);//Updates Player2
+                if($error!=NULL)
+                {
+                    return $error;
+                }//If updatePlayer Errored
+            }//If Player2 Exists
+            $player1DeckID=updateDeck($player1DeckID,$player1DeckName,$player1MainBoard,$player1SideBoard);//Update Player1Deck
+            if($error!=NULL)
+            {
+                return $error;
+            }//If updateDeck Errored
+            $player2DeckID=updateDeck($player2DeckID,$player2DeckName,$player2MainBoard,$player2SideBoard);//Update Player2Deck
+            if($error!=NULL)
+            {
+                return $error;
+            }//If updateDeck Errored
             
             
             
         }
+        
+        private function updatePlayer($id,$firstName,$lastName)
+        {
+            if($id==NULL)
+            {
+                return addPlayer($firstName,$lastName);//Creates Player if Previously NULL
+            }//If New Player 2
+            
+            $count=countPlayerUses($id);//Counts Player Uses
+            
+            if($count==1)
+            {
+                $preparedStatement=$sql->prepare('UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;');//Updates Player
+                if($preparedStatement->bind_param("sss",$firstName,$lastName,$id)==false)
+                {
+                    $error = $sql->error;
+                    return -1;//Returns -1 if errored
+                }//If didn't bind parameter
+
+                if($preparedStatement->execute()==false)
+                {
+                    $error=$preparedStatement->error;
+                    return -1;//Returns -1 if errored
+                }//If Failed to Execute Query
+
+                $preparedStatement->close();//Closes Statement
+                return $id;//Returns unchanged ID
+            }//If Only 1 Instance to Update
+            else
+            {
+                $id=addPlayer($player1FirstName,$player1LastName);//Adds Player1 or Gets Player1ID
+                if($error!=NULL)
+                {
+                    return -1;//Returns -1 if Errored
+                }//If addPlayer errored
+                return $id;//Returns new ID
+            }//If Multiple occurrences 
+        }
+        
+        private function countPlayerUses($id)
+        {
+            $preparedStatement=$sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1ID = ? OR Player2ID = ?');//Checks how many instances of playerID exist
+            if($preparedStatement->bind_param("i",$id)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows!=1)
+            {
+                $error="COUNT PlayerID ERROR";
+                return -1;//Returns -1 if errored
+            }//If Deck was in Database
+            
+            $count=$result->fetch_assoc()['Count'];//Gets count of uses of playerID
+            
+            $result->close();//Closes result
+            
+            return $count;//Returns Count
+        }
+        
+        public function updateDeck($id,$deckName,$mainBoard,$sideBoard)
+        {
+            $count=countDeckUses($id);//Counts Deck Uses
+            
+            if($count==1)
+            {
+                $preparedStatement=$sql->prepare('UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;');//Updates Player
+                if($preparedStatement->bind_param("sss",$firstName,$lastName,$id)==false)
+                {
+                    $error = $sql->error;
+                    return -1;//Returns -1 if errored
+                }//If didn't bind parameter
+
+                if($preparedStatement->execute()==false)
+                {
+                    $error=$preparedStatement->error;
+                    return -1;//Returns -1 if errored
+                }//If Failed to Execute Query
+
+                $preparedStatement->close();//Closes Statement
+                return $id;//Returns unchanged ID
+            }//If Only 1 Instance to Update
+            else
+            {
+                $id=addPlayer($player1FirstName,$player1LastName);//Adds Player1 or Gets Player1ID
+                if($error!=NULL)
+                {
+                    return -1;//Returns -1 if Errored
+                }//If addPlayer errored
+                return $id;//Returns new ID
+            }//If Multiple occurrences 
+        }
+        
+        public function countDeckUses($id)
+        {
+            $preparedStatement=$sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?');//Checks how many instances of playerID exist
+            if($preparedStatement->bind_param("i",$id)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows!=1)
+            {
+                $error="COUNT PlayerID ERROR";
+                return -1;//Returns -1 if errored
+            }//If Deck was in Database
+            
+            $count=$result->fetch_assoc()['Count'];//Gets count of uses of playerID
+            
+            $result->close();//Closes result
+            
+            return $count;//Returns Count
+        }
+        
         
     }
 ?>

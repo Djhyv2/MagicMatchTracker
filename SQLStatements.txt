@@ -81,4 +81,10 @@ SELECT LAST_INSERT_ID();
 AddMatch()
 INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Ties,Player1DeckID,Player2DeckID,Date,Tournament,Format) VALUES (?,?,?,?,?,?,?,STR_TO_DATE(?,'%m-%d-%y'),?,?);
 
+UpdatePlayer()
+SELECT COUNT(*) AS Count FROM Matches WHERE Player1ID = ? OR Player2ID = ?;
+
+UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;
+
+SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?
 
