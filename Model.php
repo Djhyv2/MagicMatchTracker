@@ -30,7 +30,7 @@
                 return array($matches,$error);//Returns Empty matches and Error
             }//If Connection Error
             
-            $results = $sql->$query('
+            $results = $sql->query('
                     SELECT Matches.ID, Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
                     FROM Matches
                     JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
@@ -73,45 +73,41 @@
             }//If Connection Error
             
                 
-                $preparedStatement = $sql->prepare('
-                        SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
-                        FROM Matches
-                        JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
-                        JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
-                        JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
-                        JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID
-                        WHERE Matches.ID = ?; ');//Prepares statement to inject ID into
-                    if($preparedStatement->bind_param("i",$id)==true)
-                    {
-                        if($preparedStatement->execute()==true)
-                        {
-                            $result=$preparedStatement->get_result();//Gets Result from Query
-                            if($result!=null)
-                            {
-                                if($result->num_rows==1)
-                                {
-                                    $match=$result->fetch_assoc();//Gets Match with given ID
-                                }//If Exactly One Result
-                                $preparedStatement->close();//Closes Statement
-                            }//If Result Retrieved
-                            else
-                            {
-                                $error=$preparedStatement->error;
-                            }//Else Failed to Retrieve Result   
-                        }//If Successfully Executed Query
-                        else
-                        {
-                            $error=$preparedStatement->error;
-                        }//Else Failed to Execute Query
-                    }//If Successfully Bound Parameter to Prepared Statement
-                    else
-                    {
-                        $error = $sql->error;
-                    }//Else didn't bind parameter
-                }//If No Connection Error
+            $preparedStatement = $sql->prepare('
+                    SELECT Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+                    FROM Matches
+                    JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
+                    JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
+                    JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
+                    JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID
+                    WHERE Matches.ID = ?; ');//Prepares statement to inject ID into
+  
+            if($preparedStatement->bind_param("i",$id)==false)
+            {
+                $error = $sql->error;
+                return array($match,$error);//Returns empty match and error string
+            }//If didn't bind parameter
             
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return array($match,$error);//Returns empty match and error string
+            }//If Failed to Execute Query
             
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return array($match,$error);//Returns empty match and error string
+            }//If Failed to Retrieve Result
             
+            if($result->num_rows==1)
+            {
+                $match=$result->fetch_assoc();//Gets Match with given ID
+            }//If Exactly One Result
+            
+            $preparedStatement->close();//Closes Statement
+
             return array($match,$error);//Returns matches and possible error string   
         }
         
@@ -181,6 +177,10 @@
                 return $error;
             }
             //Returns Error if Missing Critical Info
+            
+            $preparedStatement=$sql->prepare(
+                    
+            )
             
             
             
