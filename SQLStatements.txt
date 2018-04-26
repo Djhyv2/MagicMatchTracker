@@ -48,7 +48,7 @@ INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Player1DeckID,Player2DeckID
 
 
 GetMatches()
-SELECT Mathces.ID, Matches.Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
+SELECT Matches.ID, Matches.Player1ID AS Player1ID, Matches.Player2ID AS Player2ID, Matches.Player1DeckID AS Player1DeckID, Matches.Player2DeckID AS Player2DeckID, Format, Player1.FirstName AS "First Name", Player1.LastName AS "Last Name", Player2.FirstName AS "Opponent First Name",Player2.LastName AS "Opponent Last Name", Player1Deck.Name AS "Deck", Player2Deck.Name AS "Opponent Deck", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date,Matches.Tournament 
 FROM Matches
 JOIN Players AS Player1 ON Matches.Player1ID = Player1.ID
 JOIN Players AS Player2 ON Matches.Player2ID = Player2.ID
