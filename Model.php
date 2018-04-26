@@ -460,6 +460,22 @@
             }//If updateDeck Errored
             
             
+            $preparedStatement=$sql->prepare('UPDATE Matches SET Player1ID=?,Player2ID=?,Wins=?,Losses=?,Ties=?,Player1DeckID=?,Player2DeckID=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=?) WHERE ID=?');//Prepares Match Insert
+            if($preparedStatement->bind_param("iiiiiiisisi",$player1ID,$player2ID,$wins,$losses,$ties,$player1DeckID,$player2DeckID,$date,$tournament,$format,$matchID)==false)
+            {
+                $error = $sql->error;
+                return $error;//Returns error
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return $error;
+            }//If Failed to Execute Query
+            
+            $preparedStatement->close();//Closes Statement
+            
+            return $error;//Returns empty error if successful     
             
         }
         
@@ -536,14 +552,14 @@
             return $count;//Returns Count
         }
         
-        public function updateDeck($id,$deckName,$mainBoard,$sideBoard)
+        public function updateDeck($id,$deckName,$mainboard,$sideboard)
         {
             $count=countDeckUses($id);//Counts Deck Uses
             
             if($count==1)
             {
-                $preparedStatement=$sql->prepare('UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;');//Updates Player
-                if($preparedStatement->bind_param("sss",$firstName,$lastName,$id)==false)
+                $preparedStatement=$sql->prepare('UPDATE Decks SET Name = ?, Mainboard = ?, Sideboard = ? WHERE ID = ?;');//Updates Deck
+                if($preparedStatement->bind_param("ssss",$deckName,$mainboard,$sideboard,$id)==false)
                 {
                     $error = $sql->error;
                     return -1;//Returns -1 if errored
@@ -560,11 +576,11 @@
             }//If Only 1 Instance to Update
             else
             {
-                $id=addPlayer($player1FirstName,$player1LastName);//Adds Player1 or Gets Player1ID
+                $id=addDeck($deckName,$mainboard,$sideboard);//Adds Player1 or Gets Player1ID
                 if($error!=NULL)
                 {
                     return -1;//Returns -1 if Errored
-                }//If addPlayer errored
+                }//If addDeck errored
                 return $id;//Returns new ID
             }//If Multiple occurrences 
         }
@@ -593,7 +609,7 @@
             
             if($result->num_rows!=1)
             {
-                $error="COUNT PlayerID ERROR";
+                $error="COUNT DeckID ERROR";
                 return -1;//Returns -1 if errored
             }//If Deck was in Database
             

@@ -86,5 +86,10 @@ SELECT COUNT(*) AS Count FROM Matches WHERE Player1ID = ? OR Player2ID = ?;
 
 UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;
 
-SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?
+SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?;
+
+UPDATE Decks SET Name = ?, Mainboard = ?, Sideboard = ? WHERE ID = ?;
+
+UPDATE Matches SET Player1ID=?,Player2ID=?,Wins=?,Losses=?,Ties=?,Player1DeckID=?,Player2DeckID=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=?) WHERE ID=?
+
 
