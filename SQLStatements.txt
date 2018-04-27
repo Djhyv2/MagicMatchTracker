@@ -64,7 +64,6 @@ JOIN Decks AS Player1Deck ON Matches.Player1DeckID = Player1Deck.ID
 JOIN Decks AS Player2Deck ON Matches.Player2DeckID = Player2Deck.ID
 WHERE Matches.ID = ?; 
 
-
 AddPlayer()
 INSERT IGNORE INTO Players (FirstName,LastName) VALUES (?,?)
 
@@ -86,10 +85,18 @@ SELECT COUNT(*) AS Count FROM Matches WHERE Player1ID = ? OR Player2ID = ?;
 
 UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;
 
+UpdateDeck()
 SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?;
 
 UPDATE Decks SET Name = ?, Mainboard = ?, Sideboard = ? WHERE ID = ?;
 
-UPDATE Matches SET Player1ID=?,Player2ID=?,Wins=?,Losses=?,Ties=?,Player1DeckID=?,Player2DeckID=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=?) WHERE ID=?
+UpdateMatch()
+UPDATE Matches SET Player1ID=?,Player2ID=?,Wins=?,Losses=?,Ties=?,Player1DeckID=?,Player2DeckID=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=?) WHERE ID=?;
+DeleteMatch()
+SELECT Player1ID,Player2ID,Player1DeckID,Player2DeckID FROM Matches WHERE ID=?;
 
+DeletePlayer()
+DELETE FROM Players WHERE ID = ?;
 
+DeleteDeck()
+DELETE FROM Decks WHERE ID = ?;

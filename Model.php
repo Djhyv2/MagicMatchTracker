@@ -369,7 +369,7 @@
             $tournament=($match['tournament']!=NULL?$match['tournament']:0);//Default Not a Tournament if not specified
             $format=($match['format']!=NULL?match['format']:'Modern');//Default Modern if not specified, Gets Data input from Parameter
             $player1ID=$match['player1ID'];
-            $player2ID=($match['player2ID']!=NULL?$match['player2ID']:"");//Default Blank if Not Specified
+            $player2ID=($match['player2ID']!=NULL?$match['player2ID']:NULL);//Default Blank if Not Specified
             $player1DeckID=$match['player1DeckID'];
             $player2DeckID=$match['player2DeckID'];
             $matchID=$match['matchID'];
@@ -587,7 +587,7 @@
         
         public function countDeckUses($id)
         {
-            $preparedStatement=$sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?');//Checks how many instances of playerID exist
+            $preparedStatement=$sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?');//Checks how many instances of deckID exist
             if($preparedStatement->bind_param("i",$id)==false)
             {
                 $error = $sql->error;
@@ -620,6 +620,141 @@
             return $count;//Returns Count
         }
         
+        public function deleteMatch($id)
+        {
+            if($id==NULL)
+            {
+                $error="Invalid ID to Delete";
+                return $error;
+            }//If No ID Supplied
+            
+            
+            $preparedStatement=$sql->prepare('SELECT Player1ID,Player2ID,Player1DeckID,Player2DeckID FROM Matches WHERE ID=?');//Checks gets Deck and PlayerIDs
+            if($preparedStatement->bind_param("i",$id)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+            
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+            
+            $result=$preparedStatement->get_result();//Gets Result from Query
+            if($result==null)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Retrieve Result
+            
+            if($result->num_rows!=1)
+            {
+                $error="COUNT DeckID ERROR";
+                return -1;//Returns -1 if errored
+            }//If Deck was in Database
+            
+            $IDs=$result->fetch_assoc();//Gets array of IDs
+            
+            $result->close();//Closes result
+            
+            $Player1DeckID=$IDs['Player1DeckID'];
+            $Player2DeckID=$IDs['Player2DeckID'];
+            $player1ID=$IDs['Player1ID'];
+            $Player2ID=($IDs['Player2ID']!=NULL?$match['Player2ID']:NULL);//Gets IDs from Row
+            
+            deletePlayer($player1ID);//Deletes Player1
+            if($error!=NULL)
+            {
+                return $error;
+            }//If deletePlayer Errored
+            if($player2ID!=NULL)
+            {
+                deletePlayer($player2ID);//Deletes Player2
+                if($error!=NULL)
+                {
+                    return $error;
+                }//If deletePlayer Errored
+            }//If Player2 Exists
+            deleteDeck($player1DeckID);//Delete Player1Deck
+            if($error!=NULL)
+            {
+                return $error;
+            }//If deleteDeck Errored
+            deleteDeck($player2DeckID);//Deletes Player2Deck
+            if($error!=NULL)
+            {
+                return $error;
+            }//If deleteDeck Errored
+            
+            $preparedStatement=$sql->prepare('DELETE FROM Matches WHERE ID = ?');//Deletes Match
+            if($preparedStatement->bind_param("s",$id)==false)
+            {
+                $error = $sql->error;
+                return $error;//Returns if errored
+            }//If didn't bind parameter
+
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return $error;//Returns if errored
+            }//If Failed to Execute Query
+
+            $preparedStatement->close();//Closes Statement
+            
+            return $error;//Returns empty error if successful
+        }
+        
+        private function deletePlayer($id)
+        {
+            $count=countPlayerUses($id);
+            if($count!=1)
+            {
+                return;
+            }//If Used More than Once
+            
+            $preparedStatement=$sql->prepare('DELETE FROM Players WHERE ID = ?');//Deletes Player
+            if($preparedStatement->bind_param("s",$id)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+
+            $preparedStatement->close();//Closes Statement
+            return;//Returns nothing
+        }
+        
+        private function deleteDeck($id)
+        {
+            $count=countDeckUses($id);
+            if($count!=1)
+            {
+                return;
+            }//If Used More than Once
+            
+            $preparedStatement=$sql->prepare('DELETE FROM Decks WHERE ID = ?');//Deletes Deck
+            if($preparedStatement->bind_param("s",$id)==false)
+            {
+                $error = $sql->error;
+                return -1;//Returns -1 if errored
+            }//If didn't bind parameter
+
+            if($preparedStatement->execute()==false)
+            {
+                $error=$preparedStatement->error;
+                return -1;//Returns -1 if errored
+            }//If Failed to Execute Query
+
+            $preparedStatement->close();//Closes Statement
+            return;//Returns nothing
+        } 
         
     }
 ?>
