@@ -16,7 +16,7 @@
         {
             $this->model= new Model();
             $this->view= new View();//Creates Model and View
-            $this->view = $_GET['view'] ? $_GET['view'] : 'gameList';
+            $this->view = $_GET['view'] ? $_GET['view'] : 'matchList';
             this->action = $_POST['action'];
         }//Constructor for Controller
 
@@ -37,29 +37,29 @@
 
             switch($this->action) {
                 case 'delete':
-                    $this->handleDelete();
+                    $this->handleDeleteMatch();
                     break;
                 case 'add':
-                    $this->handleAddGame();
+                    $this->handleAddMatch();
                     break;
                 case 'edit':
-                    $this->handleEditGame();
+                    $this->handleEditMatch();
                     break;
                 case 'update':
-                    $this->handleUpdateGame();
+                    $this->handleUpdateMatch();
                     break;
             }
 
             switch($this->view) {
-                case 'gameForm':
+                case 'matchForm':
                     print $this->view->gameFormView($this->data, $this->message);
                     break;
-                 default:
+                 default: // 'matchList'
                     list($orderBy, $orderDirection) = $this->model->getOrdering();
                     if($error) {
                         $this->message = $error;
                     }
-                    print $this->view->gameListView($games, $orderBy, $orderDirction, $this->message);
+                    print $this->view->matchListView($games, $orderBy, $orderDirction, $this->message);
             }
 
         }//Main Function for Controller, Ran at Beginning of Program
@@ -70,49 +70,49 @@
             }
         }
 
-        private function handleDelete() {
-            if($ettot = $this->model->deleteGame($_POST['id'])) {
+        private function handleDeleteMatch() {
+            if($ettot = $this->model->deleteMatch($_POST['id'])) {
                 $this->message = $error;
             }
             $this->view = 'gameList';
-        }
+        } //this function pulls data from the Model when the case from the switch is == handleDeleteMatch and gets it ready for the View.
 
-        private function handleAddGame() {
+        private function handleAddMatch() {
             if($_POST['cancel']) {
-                $this->view = 'gameList';
+                $this->view = 'matchList';
                 return;
             }
-            $error = $this->model->addGame($_POST);
+            $error = $this->model->addMatch($_POST);
             if($error) {
                 $this->message = $error;
-                $this->view = 'gameForm';
+                $this->view = 'matchForm';
                 $this->data= $_POST;
             }
         }
 
-        private function handleEditGame() {
-            list($task, $error) = $this->model->getGame($_POST['id']);
+        private function handleEditMatch() {
+            list($task, $error) = $this->model->getMatch($_POST['id']);
             if($error) {
                 $this->message = $error;
-                $this->view = 'gameList';
+                $this->view = 'matchList';
                 return;
             }
             $this->data = $game;
-            $this->view = 'gameForm';
+            $this->view = 'matchForm';
         }
 
-        private function handleUpdateGame() {
+        private function handleUpdateMatch() {
             if($_POST['cancel']) {
-                $this->view = 'gameList';
+                $this->view = 'matchList';
                 return;
             }
-            if($error = $this->model->updateGame($-POST)) {
+            if($error = $this->model->updateMatch($-POST)) {
                 $this->message = $error;
-                $this->view = 'gameForm';
+                $this->view = 'matchForm';
                 $this->data = $_POST;
                 return;
             }
-            $this->view = 'gameList';
+            $this->view = 'matchList';
         }
     }
 ?>
