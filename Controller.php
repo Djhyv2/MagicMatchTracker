@@ -17,7 +17,7 @@
             $this->model= new Model();
             $this->view= new View();//Creates Model and View
             $this->view = $_GET['view'] ? $_GET['view'] : 'matchList';
-            this->action = $_POST['action'];
+            $this->action = $_POST['action'];
         }//Constructor for Controller
 
         public function __destruct() 
@@ -106,7 +106,7 @@
                 $this->view = 'matchList';
                 return;
             }
-            if($error = $this->model->updateMatch($-POST)) {
+            if($error = $this->model->updateMatch($_POST)) {
                 $this->message = $error;
                 $this->view = 'matchForm';
                 $this->data = $_POST;
