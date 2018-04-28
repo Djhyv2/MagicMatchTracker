@@ -59,7 +59,7 @@
                     if($error) {
                         $this->message = $error;
                     }
-                    print $this->view->matchListView($games, $orderBy, $orderDirction, $this->message);
+                    print $this->view->matchListView($matches, $orderBy, $orderDirction, $this->message);
             }
 
         }//Main Function for Controller, Ran at Beginning of Program
@@ -97,7 +97,7 @@
                 $this->view = 'matchList';
                 return;
             }
-            $this->data = $game;
+            $this->data = $match;
             $this->view = 'matchForm';
         }
 
