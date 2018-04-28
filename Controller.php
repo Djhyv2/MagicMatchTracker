@@ -33,7 +33,6 @@
                 exit;
             }
 
-            $this->processOrderBy();
 
             switch($this->action) {
                 case 'delete':
@@ -55,7 +54,6 @@
                     print $this->view->matchFormView($this->data, $this->message);
                     break;
                  default: // 'matchList'
-                    list($orderBy, $orderDirection) = $this->model->getOrdering();
                     if($error) {
                         $this->message = $error;
                     }
@@ -63,12 +61,6 @@
             }
 
         }//Main Function for Controller, Ran at Beginning of Program
-
-        private function processOrderBy() {
-            if($_GET['orderby']) {
-                $this->model->toggleOrder($_GET['orderby']);
-            }
-        }
 
         private function handleDeleteMatch() {
             if($ettot = $this->model->deleteMatch($_POST['id'])) {
