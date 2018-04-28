@@ -1,5 +1,5 @@
 <?php
-    echo "If you see this you index works!<br><br>";
+    echo "If you see this the index works!<br><br>";
     
     require('Credentials.php');
     require("Controller.php");
