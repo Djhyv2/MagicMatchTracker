@@ -52,7 +52,7 @@
 
             switch($this->view) {
                 case 'matchForm':
-                    print $this->view->gameFormView($this->data, $this->message);
+                    print $this->view->matchFormView($this->data, $this->message);
                     break;
                  default: // 'matchList'
                     list($orderBy, $orderDirection) = $this->model->getOrdering();
@@ -74,7 +74,7 @@
             if($ettot = $this->model->deleteMatch($_POST['id'])) {
                 $this->message = $error;
             }
-            $this->view = 'gameList';
+            $this->view = 'matchList';
         } //this function pulls data from the Model when the case from the switch is == handleDeleteMatch and gets it ready for the View.
 
         private function handleAddMatch() {
