@@ -1,5 +1,5 @@
 <?php
-    echo "If you see this you index works!";
+    echo "If you see this you index works!<br><br>";
     
     require('Credentials.php');
     require("Controller.php");
@@ -12,7 +12,7 @@
     else
     {
         echo mysqli_stat($mysqli);
-        echo "If you see this I can access your database!";
+        echo "<br><br>If you see this I can access your database!<br><br>";
     }
     
     $controller=new Controller();
