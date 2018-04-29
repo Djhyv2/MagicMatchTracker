@@ -12,7 +12,7 @@
             
         }//Destructor for View
 
-        public function matchListView ($matches, $orderby = 'wins', $orderDirection = 'desc', $message = ''){ //default order by wins descending
+        public function matchListView ($matches,/* $orderby = 'wins', $orderDirection = 'desc',*/ $message = ''){ //default order by wins descending
             $body = "<h1>Magic Match Tracker</h1>\n"; //adds the top of the page title to the $body variable to be displayed
 
             if ($message) { //if a message has been passed in, then it will be displayed
