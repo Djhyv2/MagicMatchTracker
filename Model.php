@@ -28,7 +28,7 @@
             if($this->sql==NULL)
             {
                 $this->error="No Database Connection";
-                return array($matches,$this->error)
+                return array($matches,$this->error);
             }//If No Connection to Database
             
             
@@ -76,7 +76,7 @@
             if($this->sql==NULL)
             {
                 $this->error="No Database Connection";
-                return array($matches,$this->error)
+                return array($match,$this->error);
             }//If No Connection to Database
             
             if($this->sql->connect_error!=null)
@@ -135,7 +135,7 @@
             if($this->sql==NULL)
             {
                 $this->error="No Database Connection";
-                return array($matches,$this->error)
+                return $this->error;
             }//If No Connection to Database
             
             if($this->sql->connect_error!=null)
@@ -144,24 +144,22 @@
                 return $this->error;
             }//If Connection Error
             
-            $player1LastName=($match['player1Username'];
-            $player1DeckName=$match['player1DeckName'];
-            $player1DeckLink=$match['player1DeckLink'];
-            $player1OrderedFirst=$match['player1OrderedFirst'];
-            $player2LastName=($match['player2Username'];
-            $player2DeckName=$match['player2DeckName'];
-            $player2DeckLink=$match['player2DeckLink'];
-            $player1OrderedFirst=$match['player2OrderedFirst'];
-            $wins=$match['wins'];
-            $losses=$match['losses'];
-            $ties=($match['ties']!=NULL?$match['ties']:0);//Default 0 Ties is not specified
-            $date=$match['date'];
-            $tournament=($match['tournament']!=NULL?$match['tournament']:0);//Default Not a Tournament if not specified
-            $format=($match['format']!=NULL?match['format']:'Modern');//Default Modern if not specified, Gets Data input from Parameter
+            $player1Username=$match['Player1Username'];
+            $player1DeckName=$match['Player1DeckName'];
+            $player1DeckLink=$match['Player1DeckLink'];
+            $player2Username=$match['Player2Username'];
+            $player2DeckName=$match['Player2DeckName'];
+            $player2DeckLink=$match['Player2DeckLink'];
+            $wins=$match['Wins'];
+            $losses=$match['Losses'];
+            $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
+            $date=$match['Date'];
+            $tournament=$match['Tournament'];
+            $format=$match['Format'];
 
-            if($player1FirstName==NULL)
+            if($player1Username==NULL)
             {
-                $this->error="Missing Player 1 First Name";
+                $this->error="Missing Player 1 Username";
                 return $this->error;
             }
 
@@ -170,10 +168,28 @@
                 $this->error="Missing Player 1 Deck Name";
                 return $this->error;
             }
+            
+            if($player1DeckLink==NULL)
+            {
+                $this->error="Missing Player 1 Deck Link";
+                return $this->error;
+            }
+
+            if($player2Username==NULL)
+            {
+                $this->error="Missing Player 2 Username";
+                return $this->error;
+            }
 
             if($player2DeckName==NULL)
             {
                 $this->error="Missing Player 2 Deck Name";
+                return $this->error;
+            }
+            
+            if($player2DeckLink==NULL)
+            {
+                $this->error="Missing Player 2 Deck Link";
                 return $this->error;
             }
 
@@ -194,47 +210,37 @@
                 $this->error="Missing Date";
                 return $this->error;
             }
+            
+            if($tournament==NULL)
+            {
+                $this->error="Missing Tournament";
+                return $this->error;
+            }
+            
+            if($format==NULL)
+            {
+                $this->error="Missing Format";
+                return $this->error;
+            }
             //Returns Error if Missing Critical Info
             
-            
-            $player1ID=addPlayer($player1FirstName,$player1LastName);//Adds Player1 or Gets Player1ID
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If addPlayer errored
-            $player2ID=NULL;//Default Player2ID to NULL
-            if($player2FirstName!=""||$player2LastName!="")
-            {
-                $player2ID=addPlayer($player2FirstName,$player2LastName);//Adds Player2 or Gets Player2ID
-                if($this->error!=NULL)
-                {
-                    return $this->error;
-                }//If addPlayer errored
-            }//If Player2 Information Exists
-            
-            
-            $player1DeckID=addDeck($player1DeckName,$player1MainBoard,$player1SideBoard);//Adds Player1Deck or Gets Player1DeckID
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If addDeck errored
-            $player2DeckID=addDeck($player2DeckName,$player2MainBoard,$player2SideBoard);//Adds Player2Deck or Gets Player2DeckID
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If addDeck errored
-
-            $preparedStatement=$this->sql->prepare('INSERT INTO Matches (Player1ID,Player2ID,Wins,Losses,Ties,Player1DeckID,Player2DeckID,Date,Tournament,Format) VALUES (?,?,?,?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?)');//Prepares Match Insert
-            if($preparedStatement->bind_param("iiiiiiisis",$player1ID,$player2ID,$wins,$losses,$ties,$player1DeckID,$player2DeckID,$date,$tournament,$format)==false)
+            $preparedStatement = $this->sql->prepare('
+                    BEGIN;
+                    INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);
+                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);
+                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);
+                    COMMIT;');//Prepares statement to inject ID into
+  
+            if($preparedStatement->bind_param("iiisssssssss",$wins,$losses,$ties,$date,$tournament,$format,$player1Username,$player1DeckName,$player1DeckLink,$player2Username,$player2DeckName,$player2DeckLink)==false)
             {
                 $this->error = $this->sql->error;
-                return $this->error;//Returns error
+                return $this->error;//Returns empty match and error string
             }//If didn't bind parameter
             
             if($preparedStatement->execute()==false)
             {
                 $this->error=$preparedStatement->error;
-                return $this->error;
+                return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
             $preparedStatement->close();//Closes Statement
@@ -242,123 +248,6 @@
             return $this->error;//Returns empty error if successful
         }
         
-        private function addPlayer($firstName,$lastName)
-        {
-            $preparedStatement=$this->sql->prepare('INSERT IGNORE INTO Players (FirstName,LastName) VALUES (?,?)');//Inserts if Not Duplicate Player
-            if($preparedStatement->bind_param("ss",$firstName,$lastName)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $preparedStatement->close();//Closes Statement
-            
-            
-            
-            $preparedStatement=$this->sql->prepare('SELECT ID FROM Players WHERE FirstName = ? AND LastName = ?');//Gets ID
-            if($preparedStatement->bind_param("ss",$firstName,$lastName)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $result=$preparedStatement->get_result();//Gets Result from Query
-            if($result==null)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows!=1)
-            {
-                $this->error = "Duplicate Players Detected";
-                return -1;//Returns -1 if errored
-            }//If Exactly One Result
-            
-            $id=$result->fetch_assoc()['ID'];//Gets ID with given Name
-            
-            $preparedStatement->close();//Closes Statement
-
-            return $id;//Returns ID    
-        }
-        
-        private function addDeck($name,$mainBoard,$sideBoard)
-        {
-            $preparedStatement=$this->sql->prepare('SELECT ID FROM Decks WHERE Name = ? AND Mainboard = ? AND Sideboard = ?');//Selects Deck ID if Exists
-            if($preparedStatement->bind_param("sss",$name,$mainBoard,$sideBoard)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $result=$preparedStatement->get_result();//Gets Result from Query
-            if($result==null)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows==1)
-            {
-                $id=$result->fetch_assoc()['ID'];//Gets ID with given Name
-                return $id;//Returns ID
-            }//If Deck was in Database
-            
-            
-            $preparedStatement=$this->sql->prepare('INSERT INTO Decks (Name,Mainboard,Sideboard) VALUES (?,?,?);');//Inserts if DeckID didn't Exist
-            if($preparedStatement->bind_param("sss",$name,$mainBoard,$sideBoard)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $preparedStatement->close();//Closes Statement
-            
-            
-            $result = $this->sql->query('SELECT LAST_INSERT_ID()');//Gets Newly Inserted ID
-            
-            if($result==null)
-            {
-                $this->error=$this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows!=1)
-            {   
-                $this->error="LAST_INSERT_ID() ERROR";
-                return -1;//Returns -1 if errored
-            }//If Not Exactly One Result
-            
-            $id=$result->fetch_assoc();//Gets Match with given ID
-            
-            $result->close();//Closes result
-            
-            return $id;//Returns Deck ID
-        }
         
         public function updateMatch($match)
         {
@@ -495,147 +384,6 @@
             
         }
         
-        private function updatePlayer($id,$firstName,$lastName)
-        {
-            if($id==NULL)
-            {
-                return addPlayer($firstName,$lastName);//Creates Player if Previously NULL
-            }//If New Player 2
-            
-            $count=countPlayerUses($id);//Counts Player Uses
-            
-            if($count==1)
-            {
-                $preparedStatement=$this->sql->prepare('UPDATE Players SET FirstName = ?, LastName = ? WHERE ID = ?;');//Updates Player
-                if($preparedStatement->bind_param("sss",$firstName,$lastName,$id)==false)
-                {
-                    $this->error = $this->sql->error;
-                    return -1;//Returns -1 if errored
-                }//If didn't bind parameter
-
-                if($preparedStatement->execute()==false)
-                {
-                    $this->error=$preparedStatement->error;
-                    return -1;//Returns -1 if errored
-                }//If Failed to Execute Query
-
-                $preparedStatement->close();//Closes Statement
-                return $id;//Returns unchanged ID
-            }//If Only 1 Instance to Update
-            else
-            {
-                $id=addPlayer($player1FirstName,$player1LastName);//Adds Player1 or Gets Player1ID
-                if($this->error!=NULL)
-                {
-                    return -1;//Returns -1 if Errored
-                }//If addPlayer errored
-                return $id;//Returns new ID
-            }//If Multiple occurrences 
-        }
-        
-        private function countPlayerUses($id)
-        {
-            $preparedStatement=$this->sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1ID = ? OR Player2ID = ?');//Checks how many instances of playerID exist
-            if($preparedStatement->bind_param("i",$id)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $result=$preparedStatement->get_result();//Gets Result from Query
-            if($result==null)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows!=1)
-            {
-                $this->error="COUNT PlayerID ERROR";
-                return -1;//Returns -1 if errored
-            }//If Deck was in Database
-            
-            $count=$result->fetch_assoc()['Count'];//Gets count of uses of playerID
-            
-            $result->close();//Closes result
-            
-            return $count;//Returns Count
-        }
-        
-        public function updateDeck($id,$deckName,$mainboard,$sideboard)
-        {
-            $count=countDeckUses($id);//Counts Deck Uses
-            
-            if($count==1)
-            {
-                $preparedStatement=$this->sql->prepare('UPDATE Decks SET Name = ?, Mainboard = ?, Sideboard = ? WHERE ID = ?;');//Updates Deck
-                if($preparedStatement->bind_param("ssss",$deckName,$mainboard,$sideboard,$id)==false)
-                {
-                    $this->error = $this->sql->error;
-                    return -1;//Returns -1 if errored
-                }//If didn't bind parameter
-
-                if($preparedStatement->execute()==false)
-                {
-                    $this->error=$preparedStatement->error;
-                    return -1;//Returns -1 if errored
-                }//If Failed to Execute Query
-
-                $preparedStatement->close();//Closes Statement
-                return $id;//Returns unchanged ID
-            }//If Only 1 Instance to Update
-            else
-            {
-                $id=addDeck($deckName,$mainboard,$sideboard);//Adds Player1 or Gets Player1ID
-                if($this->error!=NULL)
-                {
-                    return -1;//Returns -1 if Errored
-                }//If addDeck errored
-                return $id;//Returns new ID
-            }//If Multiple occurrences 
-        }
-        
-        public function countDeckUses($id)
-        {
-            $preparedStatement=$this->sql->prepare('SELECT COUNT(*) FROM Matches WHERE Player1DeckID = ? OR Player2DeckID = ?');//Checks how many instances of deckID exist
-            if($preparedStatement->bind_param("i",$id)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-            
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-            
-            $result=$preparedStatement->get_result();//Gets Result from Query
-            if($result==null)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows!=1)
-            {
-                $this->error="COUNT DeckID ERROR";
-                return -1;//Returns -1 if errored
-            }//If Deck was in Database
-            
-            $count=$result->fetch_assoc()['Count'];//Gets count of uses of playerID
-            
-            $result->close();//Closes result
-            
-            return $count;//Returns Count
-        }
-        
         public function deleteMatch($id)
         {
             if($id==NULL)
@@ -721,56 +469,6 @@
             
             return $this->error;//Returns empty error if successful
         }
-        
-        private function deletePlayer($id)
-        {
-            $count=countPlayerUses($id);
-            if($count!=1)
-            {
-                return;
-            }//If Used More than Once
-            
-            $preparedStatement=$this->sql->prepare('DELETE FROM Players WHERE ID = ?');//Deletes Player
-            if($preparedStatement->bind_param("s",$id)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-
-            $preparedStatement->close();//Closes Statement
-            return;//Returns nothing
-        }
-        
-        private function deleteDeck($id)
-        {
-            $count=countDeckUses($id);
-            if($count!=1)
-            {
-                return;
-            }//If Used More than Once
-            
-            $preparedStatement=$this->sql->prepare('DELETE FROM Decks WHERE ID = ?');//Deletes Deck
-            if($preparedStatement->bind_param("s",$id)==false)
-            {
-                $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
-            }//If didn't bind parameter
-
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Execute Query
-
-            $preparedStatement->close();//Closes Statement
-            return;//Returns nothing
-        } 
         
     }
 ?>

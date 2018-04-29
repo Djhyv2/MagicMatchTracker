@@ -1,9 +1,3 @@
-//DEPRECATED
-INSERT INTO Players (Username) VALUES ("Dustin Hengel"),("Brett Miller"),("Tony Willett"),("Eean McNaughton");
-
-//DEPRECATED
-INSERT INTO Decks (Name,Link) VALUES ("Tribal Zoo","http://tappedout.net/mtg-decks/5-color-domain-zoo-2/"),("Mono-Blue Tron",""),("Izzet Storm",""),("Jund","");
-
 BEGIN;
 INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (1,1,1,STR_TO_DATE("04-13-18","%m-%d-%y"),1,"Modern");
 INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),"Dustin Hengel","Tribal Zoo","http://tappedout.net/mtg-decks/5-color-domain-zoo-2/",1);
@@ -21,7 +15,8 @@ COMMIT;
 SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1 Deck", Player1Table.DeckLink AS "Player1 Deck Link", Player2Table.DeckName AS "Player2 Deck", Player2Table.DeckLink AS "Player2 Deck Link", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
 FROM Matches
 JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
-JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0;
+JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0
+ORDER BY Matches.ID DESC;
 
 
 SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1 Deck", Player1Table.DeckLink AS "Player1 Deck Link", Player2Table.DeckName AS "Player2 Deck", Player2Table.DeckLink AS "Player2 Deck Link", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
@@ -29,3 +24,9 @@ FROM Matches
 JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
 JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0
 WHERE Matches.ID = ?;
+
+BEGIN;
+INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);
+INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);
+INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);
+COMMIT;
