@@ -8,15 +8,16 @@
         private $model;//Model Component
         private $view;//View Component
 
+        private $page = '';
         private $action = '';
         private $message = '';
         private $data = array();
 
         public function __construct()
         {
-            $this->model= new Model();
-            $this->view= new View();//Creates Model and View
-            $this->view = $_GET['view'] ? $_GET['view'] : 'matchList';
+            $this->model = new Model();
+            $this->view = new View();//Creates Model and View
+            $this->page = $_GET['page'] ? $_GET['page'] : 'matchList';
             $this->action = $_POST['action'];
         }//Constructor for Controller
 
@@ -49,7 +50,7 @@
                     break;
             }
 
-            switch($this->view) {
+            switch($this->page) {
                 case 'matchForm':
                     print $this->view->matchFormView($this->data, $this->message);
                     break;
@@ -67,18 +68,18 @@
             if($ettot = $this->model->deleteMatch($_POST['id'])) {
                 $this->message = $error;
             }
-            $this->view = 'matchList';
+            $this->page = 'matchList';
         } //this function pulls data from the Model when the case from the switch is == handleDeleteMatch and gets it ready for the View.
 
         private function handleAddMatch() {
             if($_POST['cancel']) {
-                $this->view = 'matchList';
+                $this->page = 'matchList';
                 return;
             }
             $error = $this->model->addMatch($_POST);
             if($error) {
                 $this->message = $error;
-                $this->view = 'matchForm';
+                $this->page = 'matchForm';
                 $this->data= $_POST;
             }
         }
@@ -87,25 +88,25 @@
             list($task, $error) = $this->model->getMatch($_POST['id']);
             if($error) {
                 $this->message = $error;
-                $this->view = 'matchList';
+                $this->page = 'matchList';
                 return;
             }
             $this->data = $match;
-            $this->view = 'matchForm';
+            $this->page = 'matchForm';
         }
 
         private function handleUpdateMatch() {
             if($_POST['cancel']) {
-                $this->view = 'matchList';
+                $this->page = 'matchList';
                 return;
             }
             if($error = $this->model->updateMatch($_POST)) {
                 $this->message = $error;
-                $this->view = 'matchForm';
+                $this->page = 'matchForm';
                 $this->data = $_POST;
                 return;
             }
-            $this->view = 'matchList';
+            $this->page = 'matchList';
         }
     }
 ?>
