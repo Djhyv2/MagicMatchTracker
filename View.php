@@ -19,7 +19,7 @@
                 $body .= "<p class='message'>$message</p>\n";
             }
         
-            $body .= "<p><a class='matchButton' href='index.php?page=matchform'>+ Add a Match</a></p>\n"; //button to redirect to add match form
+            $body .= "<p><a class='matchButton' href='index.php?page=matchForm'>+ Add a Match</a></p>\n"; //button to redirect to add match form
 
             if (count($matches) < 1){ //if no matches exist in records, message is displayed and $body is returned to controller
                 $body .= "<p>No matches to display!</p>\n";
