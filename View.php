@@ -12,7 +12,7 @@
             
         }//Destructor for View
 
-        public function matchListView ($matches, $message = ''){
+        public function matchListView ($matches, /*$orderBy = 'wins', $orderDirection = 'desc', */$message = ''){
             $body = "<h1>Magic Match Tracker</h1>\n"; //adds the top of the page title to the $body variable to be displayed
 
             if ($message) { //if a message has been passed in, then it will be displayed
@@ -30,7 +30,7 @@
             
             //delete edit player1.firstname player1.lastname player2.firstname player2.lastname
             //player1.deck player2.deck wins losses ties dates tournament
-            $body .= "<tr><th>Delete</th><th>Edit</th><th>Player 1 Name</th><th>Player 2 Name</th><th>Player 1 Deck</th><th>Player 2 Deck</th><th>Wins</th><th>Losses</th><th>Ties</th><th>Dates</th><th>Tournament</th><th></tr>"; //column headers
+            $body .= "<tr><th>Delete</th><th>Edit</th><th>Player 1 Name</th><th>Player 2 Name</th><th>Player 1 Deck</th><th>Player 2 Deck</th><th>Wins</th><th>Losses</th><th>Ties</th><th>Dates</th><th>Tournament</th></tr>"; //column headers
             
             //block to generate table dynamically for sorting
             /* $columns = array (
@@ -151,7 +151,7 @@ EOT2;
 </head>
 <body>
 $body
-<p>Created by: Dustin Hengel, Mercy Housh, Connor Fitzmaurice, and Scott Watkins</p>
+<p>Created by: Connor Fitzmaurice, Dustin Hengel, Mercy Housh, and Scott Watkins</p>
 </body>
 </html>
 EOT;
