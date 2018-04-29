@@ -251,43 +251,41 @@
         
         public function updateMatch($match)
         {
+            if($this->sql==NULL)
+            {
+                $this->error="No Database Connection";
+                return $this->error;
+            }//If No Connection to Database
+            
             if($this->sql->connect_error!=null)
             {
                 $this->error=$this->sql->connect_error;
                 return $this->error;
             }//If Connection Error
             
-            $player1FirstName=$match['player1FirstName'];
-            $player1LastName=($match['player1LastName']!=NULL?$match['player1LastName']:"");//Default Blank if Not Specified
-            $player1DeckName=$match['player1DeckName'];
-            $player1MainBoard=($match['player1MainBoard']!=NULL?$match['player1MainBoard']:"");//Default Blank if Not Specified
-            $player1SideBoard=($match['player1SideBoard']!=NULL?$match['player1SideBoard']:"");//Default Blank if Not Specified
-            $player2FirstName=($match['player2FirstName']!=NULL?$match['player2LastName']:"");//Default Blank if Not Specified
-            $player2LastName=($match['player1LastName']!=NULL?$match['player2LastName']:"");//Default Blank if Not Specified
-            $player2DeckName=$match['player2DeckName'];
-            $player2MainBoard=($match['player2MainBoard']!=NULL?$match['player2MainBoard']:"");//Default Blank if Not Specified
-            $player2SideBoard=($match['player2SideBoard']!=NULL?$match['player2SideBoard']:"");//Default Blank if Not Specified
-            $wins=$match['wins'];
-            $losses=$match['losses'];
-            $ties=($match['ties']!=NULL?$match['ties']:0);//Default 0 Ties is not specified
-            $date=$match['date'];
-            $tournament=($match['tournament']!=NULL?$match['tournament']:0);//Default Not a Tournament if not specified
-            $format=($match['format']!=NULL?match['format']:'Modern');//Default Modern if not specified, Gets Data input from Parameter
-            $player1ID=$match['player1ID'];
-            $player2ID=($match['player2ID']!=NULL?$match['player2ID']:NULL);//Default Blank if Not Specified
-            $player1DeckID=$match['player1DeckID'];
-            $player2DeckID=$match['player2DeckID'];
-            $matchID=$match['matchID'];
+            $id=$match['ID'];
+            $player1Username=$match['Player1Username'];
+            $player1DeckName=$match['Player1DeckName'];
+            $player1DeckLink=$match['Player1DeckLink'];
+            $player2Username=$match['Player2Username'];
+            $player2DeckName=$match['Player2DeckName'];
+            $player2DeckLink=$match['Player2DeckLink'];
+            $wins=$match['Wins'];
+            $losses=$match['Losses'];
+            $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
+            $date=$match['Date'];
+            $tournament=$match['Tournament'];
+            $format=$match['Format'];
 
-            if($matchID==null)
+            if($id==NULL)
             {
-                $this->error="No MatchID";
+                $this->error="Missing Match ID";
                 return $this->error;
-            }//If No MatchID
+            }
             
-            if($player1FirstName==NULL)
+            if($player1Username==NULL)
             {
-                $this->error="Missing Player 1 First Name";
+                $this->error="Missing Player 1 Username";
                 return $this->error;
             }
 
@@ -296,10 +294,28 @@
                 $this->error="Missing Player 1 Deck Name";
                 return $this->error;
             }
+            
+            if($player1DeckLink==NULL)
+            {
+                $this->error="Missing Player 1 Deck Link";
+                return $this->error;
+            }
+
+            if($player2Username==NULL)
+            {
+                $this->error="Missing Player 2 Username";
+                return $this->error;
+            }
 
             if($player2DeckName==NULL)
             {
                 $this->error="Missing Player 2 Deck Name";
+                return $this->error;
+            }
+            
+            if($player2DeckLink==NULL)
+            {
+                $this->error="Missing Player 2 Deck Link";
                 return $this->error;
             }
 
@@ -321,67 +337,41 @@
                 return $this->error;
             }
             
-            if($player1ID==NULL)
+            if($tournament==NULL)
             {
-                $this->error="Missing Player 1 ID";
+                $this->error="Missing Tournament";
                 return $this->error;
             }
             
-            if($player1DeckID==NULL)
+            if($format==NULL)
             {
-                $this->error="Missing Player 1 DeckID";
-                return $this->error;
-            }
-            
-            if($player2DeckID==NULL)
-            {
-                $this->error="Missing Player 2 DeckID";
+                $this->error="Missing Format";
                 return $this->error;
             }
             //Returns Error if Missing Critical Info
             
-            $player1ID=updatePlayer($player1ID,$player1FirstName,$player1LastName);//Updates Player1
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If updatePlayer Errored
-            if($player2FirstName!=""||$player2LastName!="")
-            {
-                $player2ID=updatePlayer($player2ID,$player2FirstName,$player2LastName);//Updates Player2
-                if($this->error!=NULL)
-                {
-                    return $this->error;
-                }//If updatePlayer Errored
-            }//If Player2 Exists
-            $player1DeckID=updateDeck($player1DeckID,$player1DeckName,$player1MainBoard,$player1SideBoard);//Update Player1Deck
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If updateDeck Errored
-            $player2DeckID=updateDeck($player2DeckID,$player2DeckName,$player2MainBoard,$player2SideBoard);//Update Player2Deck
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If updateDeck Errored
-            
-            
-            $preparedStatement=$this->sql->prepare('UPDATE Matches SET Player1ID=?,Player2ID=?,Wins=?,Losses=?,Ties=?,Player1DeckID=?,Player2DeckID=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=?) WHERE ID=?');//Prepares Match Insert
-            if($preparedStatement->bind_param("iiiiiiisisi",$player1ID,$player2ID,$wins,$losses,$ties,$player1DeckID,$player2DeckID,$date,$tournament,$format,$matchID)==false)
+            $preparedStatement = $this->sql->prepare('
+                    BEGIN;
+                    INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);
+                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);
+                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);
+                    COMMIT;');//Prepares statement to inject ID into
+  
+            if($preparedStatement->bind_param("iiisssssssss",$wins,$losses,$ties,$date,$tournament,$format,$player1Username,$player1DeckName,$player1DeckLink,$player2Username,$player2DeckName,$player2DeckLink)==false)
             {
                 $this->error = $this->sql->error;
-                return $this->error;//Returns error
+                return $this->error;//Returns empty match and error string
             }//If didn't bind parameter
             
             if($preparedStatement->execute()==false)
             {
                 $this->error=$preparedStatement->error;
-                return $this->error;
+                return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
             $preparedStatement->close();//Closes Statement
             
-            return $this->error;//Returns empty error if successful     
-            
+            return $this->error;//Returns empty error if successful
         }
         
         public function deleteMatch($id)

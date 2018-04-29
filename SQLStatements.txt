@@ -10,6 +10,19 @@ INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES 
 INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),"Dustin Hengel","Tribal Zoo","http://tappedout.net/mtg-decks/5-color-domain-zoo-2/",0);
 COMMIT;
 
+SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1 Deck", Player1Table.DeckLink AS "Player1 Deck Link", Player2Table.DeckName AS "Player2 Deck", Player2Table.DeckLink AS "Player2 Deck Link", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
+FROM Matches
+JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
+JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0
+WHERE Matches.ID = 8;
+
+BEGIN;
+UPDATE Matches SET Wins=2,Losses=0,Ties=0,Date=STR_TO_DATE("04-21-18","%m-%d-%y"),Tournament=0,Format="Modern" WHERE ID=9;
+UPDATE MatchParts SET Username="Brett Miller",DeckName="Mono-U Tron",DeckLink="" WHERE MatchID=9 AND OrderedFirst=1;
+UPDATE MatchParts SET Username="Dustin Hengel",DeckName="Tribal Zoo",DeckLink="http://tappedout.net/mtg-decks/5-color-domain-zoo-2/" WHERE MatchID=9 AND OrderedFirst=0;
+COMMIT;
+
+
 
 
 SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1 Deck", Player1Table.DeckLink AS "Player1 Deck Link", Player2Table.DeckName AS "Player2 Deck", Player2Table.DeckLink AS "Player2 Deck Link", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
@@ -29,4 +42,10 @@ BEGIN;
 INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);
 INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);
 INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);
+COMMIT;
+
+BEGIN;
+UPDATE Matches SET Wins=?,Losses=?,Ties=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=? WHERE ID=?;
+UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=1;
+UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=0;
 COMMIT;
