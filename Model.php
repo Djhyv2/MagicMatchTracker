@@ -382,79 +382,36 @@
                 return $this->error;
             }//If No ID Supplied
             
+            if($this->sql==NULL)
+            {
+                $this->error="No Database Connection";
+                return $this->error;
+            }//If No Connection to Database
             
-            $preparedStatement=$this->sql->prepare('SELECT Player1ID,Player2ID,Player1DeckID,Player2DeckID FROM Matches WHERE ID=?');//Checks gets Deck and PlayerIDs
-            if($preparedStatement->bind_param("i",$id)==false)
+            if($this->sql->connect_error!=null)
+            {
+                $this->error=$this->sql->connect_error;
+                return $this->error;
+            }//If Connection Error
+            
+            $preparedStatement = $this->sql->prepare('
+                    BEGIN;
+                    DELETE FROM Matches WHERE ID=?;
+                    DELETE FROM MatchParts WHERE MatchID=?;
+                    COMMIT;');//Prepares statement to inject ID into
+  
+            if($preparedStatement->bind_param("ii",$id,$id)==false)
             {
                 $this->error = $this->sql->error;
-                return -1;//Returns -1 if errored
+                return $this->error;//Returns empty match and error string
             }//If didn't bind parameter
             
             if($preparedStatement->execute()==false)
             {
                 $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
+                return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
-            $result=$preparedStatement->get_result();//Gets Result from Query
-            if($result==null)
-            {
-                $this->error=$preparedStatement->error;
-                return -1;//Returns -1 if errored
-            }//If Failed to Retrieve Result
-            
-            if($result->num_rows!=1)
-            {
-                $this->error="COUNT DeckID ERROR";
-                return -1;//Returns -1 if errored
-            }//If Deck was in Database
-            
-            $IDs=$result->fetch_assoc();//Gets array of IDs
-            
-            $result->close();//Closes result
-            
-            $Player1DeckID=$IDs['Player1DeckID'];
-            $Player2DeckID=$IDs['Player2DeckID'];
-            $player1ID=$IDs['Player1ID'];
-            $Player2ID=($IDs['Player2ID']!=NULL?$match['Player2ID']:NULL);//Gets IDs from Row
-            
-            deletePlayer($player1ID);//Deletes Player1
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If deletePlayer Errored
-            if($player2ID!=NULL)
-            {
-                deletePlayer($player2ID);//Deletes Player2
-                if($this->error!=NULL)
-                {
-                    return $this->error;
-                }//If deletePlayer Errored
-            }//If Player2 Exists
-            deleteDeck($player1DeckID);//Delete Player1Deck
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If deleteDeck Errored
-            deleteDeck($player2DeckID);//Deletes Player2Deck
-            if($this->error!=NULL)
-            {
-                return $this->error;
-            }//If deleteDeck Errored
-            
-            $preparedStatement=$this->sql->prepare('DELETE FROM Matches WHERE ID = ?');//Deletes Match
-            if($preparedStatement->bind_param("s",$id)==false)
-            {
-                $this->error = $this->sql->error;
-                return $this->error;//Returns if errored
-            }//If didn't bind parameter
-
-            if($preparedStatement->execute()==false)
-            {
-                $this->error=$preparedStatement->error;
-                return $this->error;//Returns if errored
-            }//If Failed to Execute Query
-
             $preparedStatement->close();//Closes Statement
             
             return $this->error;//Returns empty error if successful

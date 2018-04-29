@@ -22,6 +22,11 @@ UPDATE MatchParts SET Username="Brett Miller",DeckName="Mono-U Tron",DeckLink=""
 UPDATE MatchParts SET Username="Dustin Hengel",DeckName="Tribal Zoo",DeckLink="http://tappedout.net/mtg-decks/5-color-domain-zoo-2/" WHERE MatchID=9 AND OrderedFirst=0;
 COMMIT;
 
+BEGIN;
+DELETE FROM Matches WHERE ID=8;
+DELETE FROM MatchParts WHERE MatchID=8;
+COMMIT;
+
 
 
 
@@ -48,4 +53,9 @@ BEGIN;
 UPDATE Matches SET Wins=?,Losses=?,Ties=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=? WHERE ID=?;
 UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=1;
 UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=0;
+COMMIT;
+
+BEGIN;
+DELETE FROM Matches WHERE ID=?;
+DELETE FROM MatchParts WHERE MatchID=?;
 COMMIT;
