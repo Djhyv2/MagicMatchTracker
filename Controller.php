@@ -54,6 +54,7 @@
                     print $this->view->matchFormView($this->data, $this->message);
                     break;
                  default: // 'matchList'
+                    list($matches, $error) = $this->model->readMatches();
                     if($error) {
                         $this->message = $error;
                     }
