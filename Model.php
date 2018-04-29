@@ -352,12 +352,12 @@
             
             $preparedStatement = $this->sql->prepare('
                     BEGIN;
-                    INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);
-                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);
-                    INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);
+                    UPDATE Matches SET Wins=?,Losses=?,Ties=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=? WHERE ID=?;
+                    UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=1;
+                    UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=0;
                     COMMIT;');//Prepares statement to inject ID into
   
-            if($preparedStatement->bind_param("iiisssssssss",$wins,$losses,$ties,$date,$tournament,$format,$player1Username,$player1DeckName,$player1DeckLink,$player2Username,$player2DeckName,$player2DeckLink)==false)
+            if($preparedStatement->bind_param("iiisssisssisssi",$wins,$losses,$ties,$date,$tournament,$format,$id,$player1Username,$player1DeckName,$player1DeckLink,$id,$player2Username,$player2DeckName,$player2DeckLink,$id)==false)
             {
                 $this->error = $this->sql->error;
                 return $this->error;//Returns empty match and error string
