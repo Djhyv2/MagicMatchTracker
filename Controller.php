@@ -57,7 +57,7 @@
                     if($error) {
                         $this->message = $error;
                     }
-                    print $this->view->matchListView($matches, $orderBy, $orderDirction, $this->message);
+                    print $this->view->matchListView($matches, $this->message);
             }
 
         }//Main Function for Controller, Ran at Beginning of Program
