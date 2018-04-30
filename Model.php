@@ -43,7 +43,7 @@
             }//If Connection Error
             
             $results = $this->sql->query('
-                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
+                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1Username", Player2Table.Username AS "Player2Username", Player1Table.DeckName AS "Player1DeckName", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2DeckName", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
                     FROM Matches
                     JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
                     JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0;');//Queries SQL Database to Read all Matches
@@ -91,7 +91,7 @@
             
                 
             $preparedStatement = $this->sql->prepare('
-                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
+                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1Username", Player2Table.Username AS "Player2Username", Player1Table.DeckName AS "Player1DeckName", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2DeckName", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
                     FROM Matches
                     JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
                     JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0
@@ -152,10 +152,10 @@
             
             $player1Username=$match['Player1Username'];
             $player1DeckName=$match['Player1DeckName'];
-            $player1DeckLink=$match['Player1DeckLink'];
+            $player1DeckLink=($match['Player1DeckLink']==NULL?"":$match['Player1DeckLink']);//Default Deck Link
             $player2Username=$match['Player2Username'];
             $player2DeckName=$match['Player2DeckName'];
-            $player2DeckLink=$match['Player2DeckLink'];
+            $player2DeckLink=($match['Player2DeckLink']==NULL?"":$match['Player2DeckLink']);//Default Deck Link
             $wins=$match['Wins'];
             $losses=$match['Losses'];
             $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
@@ -302,10 +302,10 @@
             $id=$match['ID'];
             $player1Username=$match['Player1Username'];
             $player1DeckName=$match['Player1DeckName'];
-            $player1DeckLink=$match['Player1DeckLink'];
+            $player1DeckLink=($match['Player1DeckLink']==NULL?"":$match['Player1DeckLink']);//Default Deck Link
             $player2Username=$match['Player2Username'];
             $player2DeckName=$match['Player2DeckName'];
-            $player2DeckLink=$match['Player2DeckLink'];
+            $player2DeckLink=($match['Player2DeckLink']==NULL?"":$match['Player2DeckLink']);//Default Deck Link
             $wins=$match['Wins'];
             $losses=$match['Losses'];
             $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
@@ -346,12 +346,6 @@
             if($player2DeckName==NULL)
             {
                 $this->error="Missing Player 2 Deck Name";
-                return $this->error;
-            }
-            
-            if($player2DeckLink==NULL)
-            {
-                $this->error="Missing Player 2 Deck Link";
                 return $this->error;
             }
 

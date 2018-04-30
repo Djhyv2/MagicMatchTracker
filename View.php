@@ -36,11 +36,11 @@
             foreach ($matches as $match) {
                 $id = $match['ID'];
                 $format = $match['Format'];
-                $player1 = $match['Player1'];
-                $player2 = $match['Player2'];
-                $player1Deck = $match['Player1Deck'];
+                $player1 = $match['Player1Username'];
+                $player2 = $match['Player2Username'];
+                $player1Deck = $match['Player1DeckName'];
                 $player1DeckLink=$match['Player1DeckLink'];
-                $player2Deck = $match['Player2Deck'];
+                $player2Deck = $match['Player2DeckName'];
                 $player2DeckLink= $match['Player2DeckLink'];
                 $wins = $match['Wins'];
                 $losses = $match['Losses'];
@@ -70,11 +70,11 @@
             if ($match!=NULL) 
             { 
                 $id=($match['ID']!=NULL?$match['ID']:NULL);
-                $player1Username=($match['Player1']!=NULL?$match['Player1']:"");
-                $player1DeckName=($match['Player1Deck']!=NULL?$match['Player1Deck']:"");
+                $player1Username=($match['Player1Username']!=NULL?$match['Player1Username']:"");
+                $player1DeckName=($match['Player1DeckName']!=NULL?$match['Player1DeckName']:"");
                 $player1DeckLink=($match['Player1DeckLink']!=NULL?$match['Player1DeckLink']:"");
-                $player2Username=($match['Player2']!=NULL?$match['Player2']:"");
-                $player2DeckName=($match['Player2Deck']!=NULL?$match['Player2Deck']:"");
+                $player2Username=($match['Player2Username']!=NULL?$match['Player2Username']:"");
+                $player2DeckName=($match['Player2DeckName']!=NULL?$match['Player2DeckName']:"");
                 $player2DeckLink=($match['Player2DeckLink']!=NULL?$match['Player2DeckLink']:"");
                 $wins=($match['Wins']!=NULL?$match['Wins']:"");
                 $losses=($match['Losses']!=NULL?$match['Losses']:"");
@@ -85,7 +85,7 @@
             }//Gets data from argument, sets defaults if data not present
             
             $selectedFormat=array('Modern'=>'','Sealed'=>'','Draft'=>'','Pauper'=>'','Legacy'=>'','No-Banlist Modern'=>'','Standard'=>'','Vintage'=>'','Highlander'=>'');//Array for which format is selected
-            $selectedFormat['Format']='selected';//Selects input format
+            $selectedFormat[$format]='selected';//Selects input format
             
             
 
@@ -111,7 +111,7 @@
             $body .= 
 <<<EOT2
             <p>Player 1: 
-            <input type="text" name="Player1UserName" value="$player1Username" placeholder="Player 1" maxlength="255" size="80"></p>
+            <input type="text" name="Player1Username" value="$player1Username" placeholder="Player 1" maxlength="255" size="80"></p>
 
             <p>Player 1 Deck Name: 
             <input type="text" name="Player1DeckName" value="$player1DeckName" placeholder="Player 1 Deck Name" maxlength="255" size="80"></p>
@@ -120,7 +120,7 @@
             <input type="text" name="Player1DeckLink" value="$player1DeckLink" placeholder="Player 1 Deck Link" maxlength="255" size="80"></p>
                     
             <p>Player 2: 
-            <input type="text" name="Player2UserName" value="$player2Username" placeholder="Player 2" maxlength="255" size="80"></p>
+            <input type="text" name="Player2Username" value="$player2Username" placeholder="Player 2" maxlength="255" size="80"></p>
 
             <p>Player 2 Deck Name: 
             <input type="text" name="Player2DeckName" value="$player2DeckName" placeholder="Player 2 Deck Name" maxlength="255" size="80"></p>
@@ -141,7 +141,7 @@
             <input type="text" name="Date" value="$date" placeholder="Date" maxlength="255" size="80"></p>
             
             <p>Was Tournament: 
-            <input type="checkbox" name="Wins" value='1' $tournament  maxlength="255" size="80"></p>
+            <input type="checkbox" name="Tournament" value='1' $tournament  maxlength="255" size="80"></p>
 
             <p>Format: 
             <select name='Format'>
