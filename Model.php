@@ -10,6 +10,10 @@
             require("Credentials.php");//Required Database Credentials
             $this->sql = new mysqli($server,$user,$password,$database);//Connects to Database
             $this->error = $this->sql->connect_error;//Sets Error
+            if($this->sql!=NULL)
+            {
+                $this->sql->report_mode = MYSQLI_REPORT_ALL;//Turns on Error Reporting
+            }
         }//Constructor for Model
         
         public function __destruct()
@@ -260,6 +264,7 @@
             if($this->sql->connect_error!=null)
             {
                 $this->error=$this->sql->connect_error;
+                
                 return $this->error;
             }//If Connection Error
             
@@ -393,13 +398,17 @@
                 $this->error=$this->sql->connect_error;
                 return $this->error;
             }//If Connection Error
-            
+            $this->sql->report_mode = MYSQLI_REPORT_ALL;//Turns on Error Reporting
             $preparedStatement = $this->sql->prepare('
-                    BEGIN;
-                    DELETE FROM Matches WHERE ID=?;
-                    DELETE FROM MatchParts WHERE MatchID=?;
-                    COMMIT;');//Prepares statement to inject ID into
-  
+                BEGIN;
+                DELETE FROM Matches WHERE ID=?;
+                DELETE FROM MatchParts WHERE MatchID=?;
+                COMMIT;');//Prepares statement to inject ID into
+            if($preparedStatement==false)
+            {
+                echo "SQL Error: " . $this->sql->error . "</br>Statement Error: " . $preparedStatement->error;
+                return;
+            }
             if($preparedStatement->bind_param("ii",$id,$id)==false)
             {
                 $this->error = $this->sql->error;

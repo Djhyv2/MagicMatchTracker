@@ -1,7 +1,7 @@
 BEGIN;
 INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (1,1,1,STR_TO_DATE("04-13-18","%m-%d-%y"),1,"Modern");
 INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),"Dustin Hengel","Tribal Zoo","http://tappedout.net/mtg-decks/5-color-domain-zoo-2/",1);
-INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),"Tony Willett","Izzet Storm","",0);
+INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),"Tony Willett","Izzet Kiln Fiend","",0);
 COMMIT;
 
 BEGIN;

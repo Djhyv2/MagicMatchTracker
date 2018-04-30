@@ -52,8 +52,8 @@
                 
 
                 $body .= "<tr>";
-                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='delete' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Delete'></form></td>";
-                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='edit' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Edit'></form></td>";
+                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='delete' /><input type='hidden' name='id' value=$id /><input type='submit' value='Delete'></form></td>";
+                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='edit' /><input type='hidden' name='id' value=$id /><input type='submit' value='Edit'></form></td>";
                 $body .= "<td>$format</td><td>$player1</td><td>$player2</td><td>$player1DeckCombined</td><td>$player2DeckCombined</td><td>$wins</td><td>$losses</td><td>$ties</td><td>$date</td><td>$tournament</td>";
                 $body .= "</tr>\n";
             }
