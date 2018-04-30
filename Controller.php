@@ -85,7 +85,7 @@
         }
 
         private function handleEditMatch() {
-            list($task, $error) = $this->model->getMatch($_POST['id']);
+            list($task, $error) = $this->model->readMatches($_POST['id']);
             if($error) {
                 $this->message = $error;
                 $this->page = 'matchList';
