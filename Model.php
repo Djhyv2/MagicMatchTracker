@@ -398,30 +398,49 @@
                 $this->error=$this->sql->connect_error;
                 return $this->error;
             }//If Connection Error
-            $this->sql->report_mode = MYSQLI_REPORT_ALL;//Turns on Error Reporting
-            $preparedStatement = $this->sql->prepare('
-                BEGIN;
-                DELETE FROM Matches WHERE ID=?;
-                DELETE FROM MatchParts WHERE MatchID=?;
-                COMMIT;');//Prepares statement to inject ID into
-            if($preparedStatement==false)
-            {
-                echo "SQL Error: " . $this->sql->error . "</br>Statement Error: " . $preparedStatement->error;
-                return;
-            }
-            if($preparedStatement->bind_param("ii",$id,$id)==false)
+            
+            if($this->sql->begin_transaction()==false)
+            {     
+                $this->error=$this->sql->error;
+                return $this->error;
+            }//If Failed to Begin Transaction
+            
+            $preparedStatement1 = $this->sql->prepare("DELETE FROM Matches WHERE ID=?;");//Prepares statement to inject ID into
+            
+            if($preparedStatement1->bind_param("i",$id)==false)
             {
                 $this->error = $this->sql->error;
                 return $this->error;//Returns empty match and error string
             }//If didn't bind parameter
             
-            if($preparedStatement->execute()==false)
+            if($preparedStatement1->execute()==false)
             {
-                $this->error=$preparedStatement->error;
+                $this->error=$preparedStatement1->error;
                 return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
-            $preparedStatement->close();//Closes Statement
+            $preparedStatement2 = $this->sql->prepare("DELETE FROM MatchParts WHERE MatchID=?;");//Prepares statement to inject ID into
+            
+            if($preparedStatement2->bind_param("i",$id)==false)
+            {
+                $this->error = $this->sql->error;
+                return $this->error;//Returns empty match and error string
+            }//If didn't bind parameter
+            
+            if($preparedStatement2->execute()==false)
+            {
+                $this->error=$preparedStatement2->error;
+                return $this->error;//Returns empty match and error string
+            }//If Failed to Execute Query
+            
+            if($this->sql->commit()==false);
+            {
+                $this->error=$this->sql->error;
+                return $this->error;
+            }//If Failed to End Transaction
+            
+            $preparedStatement1->close();//Closes Statement
+            $preparedStatement2->close();//Closes Statement
             
             return $this->error;//Returns empty error if successful
         }
