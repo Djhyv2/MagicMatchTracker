@@ -43,7 +43,7 @@
             }//If Connection Error
             
             $results = $this->sql->query('
-                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
+                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
                     FROM Matches
                     JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
                     JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0;');//Queries SQL Database to Read all Matches
@@ -91,7 +91,7 @@
             
                 
             $preparedStatement = $this->sql->prepare('
-                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, Matches.Date, Matches.Tournament 
+                    SELECT Matches.ID, Matches.Format, Player1Table.Username AS "Player1", Player2Table.Username AS "Player2", Player1Table.DeckName AS "Player1Deck", Player1Table.DeckLink AS "Player1DeckLink", Player2Table.DeckName AS "Player2Deck", Player2Table.DeckLink AS "Player2DeckLink", Matches.Wins ,Matches.Losses, Matches.Ties, DATE_FORMAT(Matches.Date,"%m-%d-%y") AS "Date", Matches.Tournament 
                     FROM Matches
                     JOIN MatchParts AS Player1Table ON Player1Table.MatchID = Matches.ID AND Player1Table.OrderedFirst = 1
                     JOIN MatchParts AS Player2Table ON Player2Table.MatchID = Matches.ID AND Player2Table.OrderedFirst = 0
@@ -160,7 +160,7 @@
             $losses=$match['Losses'];
             $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
             $date=$match['Date'];
-            $tournament=$match['Tournament'];
+            $tournament=($match['Tournament']!=NULL?$match['Tournament']:0);//Default 0 for Tournament
             $format=$match['Format'];
 
             if($player1Username==NULL)
@@ -214,12 +214,6 @@
             if($date==NULL)
             {
                 $this->error="Missing Date";
-                return $this->error;
-            }
-            
-            if($tournament==NULL)
-            {
-                $this->error="Missing Tournament";
                 return $this->error;
             }
             
@@ -316,7 +310,7 @@
             $losses=$match['Losses'];
             $ties=($match['Ties']!=""?$match['Ties']:0);//Default 0 Ties is not specified
             $date=$match['Date'];
-            $tournament=$match['Tournament'];
+            $tournament=($match['Tournament']!=NULL?$match['Tournament']:0);//Default 0 for Tournament
             $format=$match['Format'];
 
             if($id==NULL)
@@ -376,12 +370,6 @@
             if($date==NULL)
             {
                 $this->error="Missing Date";
-                return $this->error;
-            }
-            
-            if($tournament==NULL)
-            {
-                $this->error="Missing Tournament";
                 return $this->error;
             }
             
