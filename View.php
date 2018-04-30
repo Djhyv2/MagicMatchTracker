@@ -24,7 +24,7 @@
 
             if (count($matches) < 1){ //if no matches exist in records, message is displayed and $body is returned to controller
                 $body .= "<p>No Matches to Display</p>\n";
-                return pages($body);
+                return $this->page($body);
             }
 
             $body .= "<table>\n"; //open table tag
@@ -70,11 +70,11 @@
             if ($match!=NULL) 
             { 
                 $id=($match['ID']!=NULL?$match['ID']:NULL);
-                $player1Username=($match['Player1Username']!=NULL?$match['Player1Username']:"");
-                $player1DeckName=($match['Player1DeckName']!=NULL?$match['Player1DeckName']:"");
+                $player1Username=($match['Player1']!=NULL?$match['Player1']:"");
+                $player1DeckName=($match['Player1Deck']!=NULL?$match['Player1Deck']:"");
                 $player1DeckLink=($match['Player1DeckLink']!=NULL?$match['Player1DeckLink']:"");
-                $player2Username=($match['Player2Username']!=NULL?$match['Player2Username']:"");
-                $player2DeckName=($match['Player2DeckName']!=NULL?$match['Player2DeckName']:"");
+                $player2Username=($match['Player2']!=NULL?$match['Player2']:"");
+                $player2DeckName=($match['Player2Deck']!=NULL?$match['Player2Deck']:"");
                 $player2DeckLink=($match['Player2DeckLink']!=NULL?$match['Player2DeckLink']:"");
                 $wins=($match['Wins']!=NULL?$match['Wins']:"");
                 $losses=($match['Losses']!=NULL?$match['Losses']:"");
@@ -134,7 +134,7 @@
             <p>Losses: 
             <input type="text" name="Losses" value="$losses" placeholder="Losses" maxlength="255" size="80"></p>
                     
-            <p>Ties: 
+            <p>Ties (Optional): 
             <input type="text" name="Ties" value="$ties" placeholder="Ties" maxlength="255" size="80"></p>
                     
             <p>Date (mm-dd-yy): 
@@ -166,7 +166,7 @@ EOT2;
 
             
             
-            return page($body);
+            return $this->page($body);
         }
 
         public function errorView($message) 

@@ -11,7 +11,7 @@
         private $page = '';
         private $action = '';
         private $message = '';
-        private $data = array();
+        private $data;
 
         public function __construct()
         {
@@ -54,7 +54,7 @@
                 case 'matchForm':
                     print $this->view->matchFormView($this->data, $this->message);
                     break;
-                 default: // 'matchList'
+                default: // 'matchList'
                     list($matches, $error) = $this->model->readMatches();
                     if($error) {
                         $this->message = $error;
@@ -65,7 +65,7 @@
         }//Main Function for Controller, Ran at Beginning of Program
 
         private function handleDeleteMatch() {
-            if($ettot = $this->model->deleteMatch($_POST['id'])) {
+            if($error = $this->model->deleteMatch($_POST['id'])) {
                 $this->message = $error;
             }
             $this->page = 'matchList';
@@ -84,8 +84,9 @@
             }
         }
 
-        private function handleEditMatch() {
-            list($task, $error) = $this->model->readMatches($_POST['id']);
+        private function handleEditMatch() 
+        {
+            list($match, $error) = $this->model->readMatch($_POST['id']);
             if($error) {
                 $this->message = $error;
                 $this->page = 'matchList';
