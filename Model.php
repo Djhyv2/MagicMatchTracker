@@ -230,13 +230,6 @@
             }
             //Returns Error if Missing Critical Info
             
-            
-            if($this->sql->begin_transaction()==false)
-            {     
-                $this->error=$this->sql->error;
-                return $this->error;
-            }//If Failed to Begin Transaction
-            
             $preparedStatement1 = $this->sql->prepare('INSERT INTO Matches (Wins,Losses,Ties,Date,Tournament,Format) VALUES (?,?,?,STR_TO_DATE(?,"%m-%d-%y"),?,?);');//Prepares statement to inject ID into
   
             if($preparedStatement1->bind_param("iiisss",$wins,$losses,$ties,$date,$tournament,$format)==false)
@@ -251,6 +244,7 @@
                 return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
+            $preparedStatement1->close();//Closes Statement
             
             $preparedStatement2 = $this->sql->prepare('INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,1);');//Prepares statement to inject ID into
   
@@ -266,7 +260,7 @@
                 return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
-            
+            $preparedStatement2->close();//Closes Statement
             
             $preparedStatement3 = $this->sql->prepare('INSERT INTO MatchParts (MatchID,Username,DeckName,DeckLink,OrderedFirst) VALUES (LAST_INSERT_ID(),?,?,?,0);');//Prepares statement to inject ID into
   
@@ -282,15 +276,13 @@
                 return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
+            $preparedStatement3->close();//Closes Statement
+            
             if($this->sql->commit()==false)
             {
                 $this->error=$this->sql->error;
                 return $this->error;
             }//If Failed to End Transaction
-            
-            $preparedStatement1->close();//Closes Statement
-            $preparedStatement2->close();//Closes Statement
-            $preparedStatement3->close();//Closes Statement
             
             return $this->error;//Returns empty error if successful
         }
@@ -303,6 +295,8 @@
                 $this->error="No Database Connection";
                 return $this->error;
             }//If No Connection to Database
+            
+            $this->sql->autocommit(false);//Turns Auto Commit off
             
             if($this->sql->connect_error!=null)
             {
@@ -398,26 +392,59 @@
             }
             //Returns Error if Missing Critical Info
             
-            $preparedStatement = $this->sql->prepare('
-                    BEGIN;
-                    UPDATE Matches SET Wins=?,Losses=?,Ties=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=? WHERE ID=?;
-                    UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=1;
-                    UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=0;
-                    COMMIT;');//Prepares statement to inject ID into
+            $preparedStatement1 = $this->sql->prepare('UPDATE Matches SET Wins=?,Losses=?,Ties=?,Date=STR_TO_DATE(?,"%m-%d-%y"),Tournament=?,Format=? WHERE ID=?;');//Prepares statement to inject ID into
   
-            if($preparedStatement->bind_param("iiisssisssisssi",$wins,$losses,$ties,$date,$tournament,$format,$id,$player1Username,$player1DeckName,$player1DeckLink,$id,$player2Username,$player2DeckName,$player2DeckLink,$id)==false)
+            if($preparedStatement1->bind_param("iiisssi",$wins,$losses,$ties,$date,$tournament,$format,$id)==false)
             {
                 $this->error = $this->sql->error;
                 return $this->error;//Returns empty match and error string
             }//If didn't bind parameter
             
-            if($preparedStatement->execute()==false)
+            if($preparedStatement1->execute()==false)
             {
-                $this->error=$preparedStatement->error;
+                $this->error=$preparedStatement1->error;
                 return $this->error;//Returns empty match and error string
             }//If Failed to Execute Query
             
-            $preparedStatement->close();//Closes Statement
+            $preparedStatement1->close();//Closes Statement
+            
+            $preparedStatement2 = $this->sql->prepare('UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=1;');//Prepares statement to inject ID into
+  
+            if($preparedStatement2->bind_param("sssi",$player1Username,$player1DeckName,$player1DeckLink,$id)==false)
+            {
+                $this->error = $this->sql->error;
+                return $this->error;//Returns empty match and error string
+            }//If didn't bind parameter
+            
+            if($preparedStatement2->execute()==false)
+            {
+                $this->error=$preparedStatement2->error;
+                return $this->error;//Returns empty match and error string
+            }//If Failed to Execute Query
+            
+            $preparedStatement2->close();//Closes Statement
+            
+            $preparedStatement3 = $this->sql->prepare('UPDATE MatchParts SET Username=?,DeckName=?,DeckLink=? WHERE MatchID=? AND OrderedFirst=0;');//Prepares statement to inject ID into
+  
+            if($preparedStatement3->bind_param("sssi",$player2Username,$player2DeckName,$player2DeckLink,$id)==false)
+            {
+                $this->error = $this->sql->error;
+                return $this->error;//Returns empty match and error string
+            }//If didn't bind parameter
+            
+            if($preparedStatement3->execute()==false)
+            {
+                $this->error=$preparedStatement3->error;
+                return $this->error;//Returns empty match and error string
+            }//If Failed to Execute Query
+            
+            $preparedStatement3->close();//Closes Statement
+            
+            if($this->sql->commit()==false)
+            {
+                $this->error=$this->sql->error;
+                return $this->error;
+            }//If Failed to End Transaction
             
             return $this->error;//Returns empty error if successful
         }
@@ -482,9 +509,6 @@
                 $this->error=$this->sql->error;
                 return $this->error;
             }//If Failed to End Transaction
-            
-            
-            
             
             return $this->error;//Returns empty error if successful
         }
