@@ -12,8 +12,8 @@
             
         }//Destructor for View
 
-        public function matchListView ($matches, /*$orderBy = 'wins', $orderDirection = 'desc', */$message = ''){
-            $body = "<h1>Magic Match Tracker</h1>\n"; //adds the top of the page title to the $body variable to be displayed
+        public function matchListView ($matches, $message = ''){
+            $body = "<h1>$this->pageTitle</h1>\n"; //adds the top of the page title to the $body variable to be displayed
 
             if ($message) { //if a message has been passed in, then it will be displayed
                 $body .= "<p class='message'>$message</p>\n";
@@ -28,52 +28,34 @@
 
             $body .= "<table>\n"; //open table tag
             
-            //delete edit player1.firstname player1.lastname player2.firstname player2.lastname
-            //player1.deck player2.deck wins losses ties dates tournament
-            $body .= "<tr><th>Delete</th><th>Edit</th><th>Player 1 Name</th><th>Player 2 Name</th><th>Player 1 Deck</th><th>Player 2 Deck</th><th>Wins</th><th>Losses</th><th>Ties</th><th>Dates</th><th>Tournament</th></tr>"; //column headers
+            $body .= "<tr><th></th><th></th><th>Format</th><th>Player 1</th><th>Player 2</th><th>Player 1 Deck</th><th>Player 2 Deck</th><th>Wins</th><th>Losses</th><th>Ties</th><th>Date</th><th>Tournament</th></tr>"; //column headers
             
-            //block to generate table dynamically for sorting
-            /* $columns = array (
-                array ('name' => 'player1', 'label' => 'Player 1'),
-                array ('name' => 'player2', 'label' => 'Player 2'),
-                array ('name' => 'wins', 'label' => 'Wins'),
-                array ('name' => 'losses', 'label' => 'Losses'),
-                array ('name' => 'ties', 'label' => 'Ties')
-            );
-
-            foreach ($columns as $column) {
-                $name = $column['name'];
-                $label = $column['label'];
-                
-                if ($name == $orderby) {
-                    if ($orderDirection == 'asc') {
-                        $label .= " &#x25BC;"; // ▼                    
-                    } else {
-                        $label .= " &#x25B2;"; // ▲
-                    }
-                }
-                
-                $body .= "<th><a class='order' href='index.php?orderby=$name'>$label</a></th>";
-            } */
 
             //fill match data into columns
             foreach ($matches as $match) {
-                $id = $match['id'];
-                $player1 = $match['firstName'] . " " . $match['lastName'];
-                $player2 = $match['opponentFirstName'] . " " . $match['opponentLastName'];
-                $player1Deck = $match['player1Deck'];
-                $player2Deck = $match['player2Deck'];
-                $wins = $match['wins'];
-                $losses = $match['losses'];
-                $ties = $match['ties'];
-                $dates = $match['dates'];
-                $tournament = $match['tournament'];
+                $id = $match['ID'];
+                $format = $match['Format'];
+                $player1 = $match['Player1'];
+                $player2 = $match['Player2'];
+                $player1Deck = $match['Player1Deck'];
+                $player1DeckLink=$match['Player1DeckLink'];
+                $player2Deck = $match['Player2Deck'];
+                $player2DeckLink= $match['Player2DeckLink'];
+                $wins = $match['Wins'];
+                $losses = $match['Losses'];
+                $ties = $match['Ties'];
+                $date = $match['Date'];
+                $tournament = $match['Tournament'];
+                
+                $player1DeckCombined = ($player1DeckLink==""?$player1Deck:"<a href='$player1DeckLink'>$player1Deck</a>");//Combines Link with Name
+                $player2DeckCombined = ($player2DeckLink==""?$player2Deck:"<a href='$player2DeckLink'>$player2Deck</a>");//Combines Link with Name
+                
 
                 $body .= "<tr>";
-				$body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='delete' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Delete'></form></td>";
-				$body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='edit' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Edit'></form></td>";
-				$body .= "<td>$player1</td><td>$player2</td><td>$player1Deck</td><td>$player2Deck</td><td>$wins</td><td>$losses</td><td>$ties</td><td>$dates</td><td>$tournament</td>";
-				$body .= "</tr>\n";
+                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='delete' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Delete'></form></td>";
+                $body .= "<td><form action='index.php' method='post'><input type='hidden' name='action' value='edit' /><input type='hidden' name='id' value='$id' /><input type='submit' value='Edit'></form></td>";
+                $body .= "<td>$format</td><td>$player1</td><td>$player2</td><td>$player1DeckCombined</td><td>$player2DeckCombined</td><td>$wins</td><td>$losses</td><td>$ties</td><td>$date</td><td>$tournament</td>";
+                $body .= "</tr>\n";
             }
 
             $body .= "</table>\n"; //end table tag
