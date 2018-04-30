@@ -174,12 +174,6 @@
                 $this->error="Missing Player 1 Deck Name";
                 return $this->error;
             }
-            
-            if($player1DeckLink==NULL)
-            {
-                $this->error="Missing Player 1 Deck Link";
-                return $this->error;
-            }
 
             if($player2Username==NULL)
             {
@@ -193,11 +187,6 @@
                 return $this->error;
             }
             
-            if($player2DeckLink==NULL)
-            {
-                $this->error="Missing Player 2 Deck Link";
-                return $this->error;
-            }
 
             if($wins==NULL)
             {
@@ -328,12 +317,6 @@
             if($player1DeckName==NULL)
             {
                 $this->error="Missing Player 1 Deck Name";
-                return $this->error;
-            }
-            
-            if($player1DeckLink==NULL)
-            {
-                $this->error="Missing Player 1 Deck Link";
                 return $this->error;
             }
 
