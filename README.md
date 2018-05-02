@@ -7,6 +7,8 @@ Magic Match Tracker was created during the Spring 2018 semester. Magic Match Tra
 This application is used to keep track of games played in Magic: The Gathering. It can be used for someone to review what decks they have used in what circumstances and how they might change playstyles in the future. It also could be used to see what cards you should buy for your decks by reviewing the deck list of someone you have played against. It provides you with a history of games you have played which you could use for data such as win rates, weaknesses of your decks, and what strengths you have.
 
 ### Schema
+Matches: ID (PK), Wins, Losses, Ties, Date, Tournament, Format
+MatchParts: MatchID (PK), Username (PK), DeckName (PK), DeckLink (PK), OrderedFirst
 
 ### Entity Relationship Diagram
 https://github.com/Djhyv2/MagicMatchTracker/blob/master/MagicMatchUML.png
